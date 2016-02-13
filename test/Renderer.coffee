@@ -36,4 +36,3 @@ describe 'Renderer', ->
         it 'should include archived/closed lists if true is passed', ->
             data = instance.renderJSON true
             expect(Object.keys(data.lists).length).to.be 2
-

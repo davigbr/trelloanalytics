@@ -12,12 +12,13 @@ class Renderer
                     times: 
                         sum: list.times.sum
                         count: list.times.count
-                        average: list.times.average
+                        mean: list.times.mean
                         median: list.times.median
                         max: list.times.max
                         min: list.times.min
+                        values: list.times.values
                         medianFormatted: numeral(list.times.median / 1000).format('00:00:00')
-                        averageFormatted: numeral(list.times.average / 1000).format('00:00:00')
+                        meanFormatted: numeral(list.times.mean / 1000).format('00:00:00')
                         maxFormatted: numeral(list.times.max / 1000).format('00:00:00')
                         minFormatted: numeral(list.times.min / 1000).format('00:00:00')
         return output

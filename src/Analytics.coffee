@@ -5,10 +5,12 @@ class Analytics
     constructor: ->
         @now = new Date()
 
+    # Takes data from a Trello board from TrelloFetcher and returns and 
+    # object containing lists and cards with processed times
     process: (data) -> 
         @extractor = new Extractor data
-        lists = @extractor.getListsById()
-        cards = @extractor.getCardsById()
+        lists = @extractor.extractListsById()
+        cards = @extractor.extractCardsById()
 
         for cardId, card of cards
             cards[cardId].times = @processCardTimes lists, @extractor.findCardActions cardId
@@ -17,39 +19,8 @@ class Analytics
 
         return lists: lists, cards: cards
 
-    processListsTimes: (lists, cards) ->
-        listTimes = {}
-        for listId, list of lists
-            list.times = 
-                sum: 0,
-                count: 0,
-                mean: 0,
-                median: 0,
-                max: null,
-                min: null
-                values: []
-
-            for cardId, card of cards
-                time = card.times[listId]
-
-                list.times.sum += time
-                list.times.values.push time
-                list.times.count++
-
-                if list.times.min is null or time > list.times.max
-                    list.times.max = time
-
-                if list.times.min is null or time < list.times.min
-                    list.times.min = time
-
-            if list.times.count is 0
-                list.times.mean = 0
-            else
-                list.times.mean = list.times.sum / list.times.count
-
-            list.times.median = math.median list.times.values
-
-
+    # Takes all actions from a specific card to count the time a card remained on each list
+    # Return an object containing all lists with the time spent on each
     processCardTimes: (lists, cardActions) ->
         listTimes = {}
 
@@ -85,6 +56,36 @@ class Analytics
             i++
         return listTimes
 
+    # Takes all cards that their times were calculated on each list to sum and get 
+    # global sum, count, mean and median metric for each list
+    processListsTimes: (lists, cards) ->
+        listTimes = {}
+        for listId, list of lists
+            list.times = 
+                sum: 0,
+                count: 0,
+                mean: null,
+                median: null,
+                max: null,
+                min: null
+                values: []
+
+            for cardId, card of cards
+                time = card.times[listId]
+
+                list.times.sum += time
+                list.times.values.push time
+                list.times.count++
+
+                if list.times.min is null or time > list.times.max
+                    list.times.max = time
+
+                if list.times.min is null or time < list.times.min
+                    list.times.min = time
+
+            if list.times.count isnt 0
+                list.times.mean = list.times.sum / list.times.count
+                list.times.median = math.median list.times.values
 
 
 module.exports = Analytics

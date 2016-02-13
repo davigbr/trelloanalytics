@@ -14,13 +14,13 @@ class Extractor
         cardActions.reverse()
         return cardActions
 
-    getListsById: ->
+    extractListsById: ->
         listsById = {}
         for list in @data.lists
             listsById[list.id] = list
         return listsById
         
-    getCardsById: ->
+    extractCardsById: ->
         cardsById = {}
         for card in @data.cards
             cardsById[card.id] = card
