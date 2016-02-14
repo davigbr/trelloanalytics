@@ -7,12 +7,14 @@ Analytics = require './src/Analytics'
 Renderer = require './src/Renderer'
 
 app.use express.static 'static'
-app.use express.static 'pages'
 app.set 'view engine', 'jade'
 
 app.set 'port', process.env.PORT or 3000
 
-app.get '/authorized/:token', (req, res) ->
+app.get '/', (req, res) ->
+    res.render 'index'
+
+app.get '/:token', (req, res) ->
 
     token = req.params.token
     appKey = 'cb7acdb2fee72c75964b52f7888feee0'
@@ -28,7 +30,7 @@ app.get '/authorized/:token', (req, res) ->
             includeClosedCards: false
             #onlyAfterDate: moment().subtract(30, 'days').toDate()
             #onlyBeforeDate: moment().subtract(15, 'days').toDate()
-        res.render 'index', 
+        res.render 'dashboard', 
             title: 'Trello Analytics'
             data: processedData
 
