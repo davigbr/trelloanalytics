@@ -32,5 +32,5 @@ app.get '/authorized/:token', (req, res) ->
             title: 'Trello Analytics'
             data: processedData
 
-app.listen app.get('port'), -> 
+app.listen app.get('port'), '0.0.0.0', -> 
     console.log 'Example app listening on port ' + app.get('port') + '!'
