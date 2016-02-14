@@ -10,12 +10,18 @@ app.use express.static 'static'
 app.use express.static 'pages'
 app.set 'view engine', 'jade'
 
+port = 3000
+
+if process.env.PRODUCTION is 'true'
+    port = 80
+
 app.get '/authorized/:token', (req, res) ->
 
     token = req.params.token
     appKey = 'cb7acdb2fee72c75964b52f7888feee0'
     boardId = 'lS6D7U5T'
     #'BdebeREh' #'9O7SmOjz' 
+
     fetcher = new TrelloFetcher appKey, token
     fetcher.loadBoard boardId, (err, data) -> 
         return res.send(err) if err
@@ -29,5 +35,5 @@ app.get '/authorized/:token', (req, res) ->
             title: 'Trello Analytics'
             data: processedData
 
-app.listen 3000, -> 
-    console.log('Example app listening on port 3000!')
+app.listen port, -> 
+    console.log "Example app listening on port #{port}!"
