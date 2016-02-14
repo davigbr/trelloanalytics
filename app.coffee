@@ -10,7 +10,7 @@ app.use express.static 'static'
 app.use express.static 'pages'
 app.set 'view engine', 'jade'
 
-app.set('port', (process.env.PORT || 3000));
+app.set 'port', process.env.PORT or 3000
 
 app.get '/authorized/:token', (req, res) ->
 
@@ -32,5 +32,5 @@ app.get '/authorized/:token', (req, res) ->
             title: 'Trello Analytics'
             data: processedData
 
-app.listen app.get 'port', -> 
+app.listen app.get('port'), -> 
     console.log 'Example app listening on port ' + app.get('port') + '!'
