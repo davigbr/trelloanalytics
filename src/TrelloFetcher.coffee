@@ -95,7 +95,7 @@ class TrelloFetcher
                                     lists: @cleanLists allLists
                                     cards: @cleanCards cards
                                 
-                                fs.writeFileSync 'tmp/data.json', JSON.stringify output, null, 4
+                                # fs.writeFileSync 'tmp/data.json', JSON.stringify output, null, 4
                                 
                                 callback null, output
 
