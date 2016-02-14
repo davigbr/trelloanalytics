@@ -37,27 +37,29 @@ describe 'Intervals', ->
                 expect(list.times.max).to.be null
                 expect(list.times.min).to.be null
 
+        msInAnHr = 60 * 60 * 1000
+
         it 'should calculate the list times correctly', ->
             extractor = new Extractor readDataFile 'few-actions'
             output = intervals.calculate extractor.extractLists(), extractor.extractCards()
             todo = output.lists[todoId]
             doing = output.lists[doingId]
 
-            expect(todo.times.sum).to.be 12733
+            expect(todo.times.sum).to.be 12733 / msInAnHr
             expect(todo.times.count).to.be 2
-            expect(todo.times.mean).to.be 6366.5
-            expect(todo.times.median).to.be 6366.5
-            expect(todo.times.max).to.be 6981
-            expect(todo.times.min).to.be 5752
-            expect(todo.times.values).to.eql [6981, 5752]
+            expect(todo.times.mean).to.be 6366.5 / msInAnHr
+            expect(todo.times.median).to.be 6366.5 / msInAnHr
+            expect(todo.times.max).to.be 6981 / msInAnHr
+            expect(todo.times.min).to.be 5752 / msInAnHr
+            expect(todo.times.values).to.eql [6981 / msInAnHr, 5752 / msInAnHr]
 
-            expect(doing.times.sum).to.be 19259
+            expect(doing.times.sum).to.be 0.005349722222222223
             expect(doing.times.count).to.be 2
-            expect(doing.times.mean).to.be 9629.5
-            expect(doing.times.median).to.be 9629.5
-            expect(doing.times.max).to.be 10514
-            expect(doing.times.min).to.be 8745
-            expect(doing.times.values).to.eql [10514, 8745]
+            expect(doing.times.mean).to.be 0.0026748611111111114
+            expect(doing.times.median).to.be 0.0026748611111111114
+            expect(doing.times.max).to.be 10514 / msInAnHr
+            expect(doing.times.min).to.be 8745 / msInAnHr
+            expect(doing.times.values).to.eql [10514 / msInAnHr, 8745 / msInAnHr]
 
         it 'should calculate the card times correctly', ->
             extractor = new Extractor readDataFile 'few-actions'
@@ -65,9 +67,9 @@ describe 'Intervals', ->
             aStoryCard = output.cards[aStoryCardId]
             anotherStoryCard = output.cards[anotherStoryCardId]
             
-            expect(aStoryCard.times[todoId]).to.be 6981
-            expect(aStoryCard.times[doingId]).to.be 10514
-            expect(anotherStoryCard.times[todoId]).to.be 5752
-            expect(anotherStoryCard.times[doingId]).to.be 8745
+            expect(aStoryCard.times[todoId]).to.be 6981 / msInAnHr
+            expect(aStoryCard.times[doingId]).to.be 10514 / msInAnHr
+            expect(anotherStoryCard.times[todoId]).to.be 5752 / msInAnHr
+            expect(anotherStoryCard.times[doingId]).to.be 8745 / msInAnHr
 
 

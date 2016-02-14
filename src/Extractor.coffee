@@ -44,7 +44,7 @@ class Extractor
                     combinationPresent = true
                     break
 
-            if !combinationPresent
+            if !combinationPresent and card.idLabels.length isnt 0
                 combinations.push card.idLabels
 
         combinations
@@ -73,7 +73,7 @@ class Extractor
         for card in @data.cards
 
             card.actions = @findCardActions card.id
-            console.log card.actions
+
             if card.actions.length is 0
                 card.firstActionOnBoard = new Date 0 # Unix Epoch
             else

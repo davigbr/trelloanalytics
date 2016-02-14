@@ -1,0 +1,76 @@
+doctype html
+html(lang="en")
+    head
+        script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js")
+        script(src="//d3js.org/d3.v3.min.js" charset="utf-8")
+        script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous")
+        script(src="https://cdn.plot.ly/plotly-latest.min.js")
+        script(type="text/javascript").
+            jQuery(document).ready(function ($) {
+                $('ul.nav-tabs').each(function() {
+                    $(this).tab('show');
+                    $('a:first', $(this)).click();
+                });
+            });
+
+        link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous")
+        link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous")
+
+        title!=title
+
+        meta(charset="utf-8")
+        meta(http-equiv="X-UA-Compatible" content="IE=edge")
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+    body
+        div.container-fluid
+            div.row
+                div.main.col-lg-12
+                    h1 Trello Analytics
+                    ul.nav.nav-tabs(role="tablist")
+                        li(role="presentation" class="active"): a(href="#global" aria-controls="global" role="tab" data-toggle="tab") Global Metrics
+                        li(role="presentation" class="active"): a(href="#no-label" aria-controls="no-label" role="tab" data-toggle="tab") No Label Metrics
+                        each element, index in data.labelFiltered
+                            li(role="presentation" class="active")
+                                a(href="#filtered-"+index aria-controls="filtered-!=index" role="tab" data-toggle="tab")!=element.name
+                    div.tab-content
+                        div#global.tab-pane.active(role="tabpanel") 
+                            h2 Global Metrics
+                            ul.nav.nav-tabs(role="tablist")
+                                each list, listId in data.global.lists
+                                    if !list.closed
+                                        li(role="presentation" class="active"): a(href="#global-list-"+listId aria-controls="global-list-"+listId role="tab" data-toggle="tab")!=list.name
+                            div.tab-content
+                                each list, listId in data.global.lists
+                                    if !list.closed
+                                        div.tab-pane(id="global-list-"+listId role="tabpanel")
+                                            //pre!=JSON.stringify(list.times)
+                                            div(id="histogram-" + listId)
+                                            script(type="text/javascript").
+                                                var data = [{
+                                                    nbinsx: 10,
+                                                    x: !{JSON.stringify(list.times.values)},
+                                                    type: 'histogram'
+                                                  }
+                                                ];
+                                                Plotly.newPlot('histogram-#{listId}', data);
+                                            table.table.table-striped
+                                                thead
+                                                    tr
+                                                        th Mean
+                                                        th Median
+                                                        th Min
+                                                        th Max
+                                                tbody
+                                                    tr
+                                                        td!=list.times.mean.toFixed(2) + ' hours'
+                                                        td!=list.times.median.toFixed(2) + ' hours'
+                                                        td!=list.times.min.toFixed(2) + ' hours'
+                                                        td!=list.times.max.toFixed(2) + ' hours'
+
+                        div#no-label.tab-pane(role="tabpanel")
+                            h2 No Label Metrics
+
+                        each element, index in data.labelFiltered
+                            div.tab-pane(id="filtered-"+index role="tabpanel") 
+                                h2!=element.name
+

@@ -8,6 +8,7 @@ Renderer = require './src/Renderer'
 
 app.use express.static 'static'
 app.use express.static 'pages'
+app.set 'view engine', 'jade'
 
 app.get '/authorized/:token', (req, res) ->
 
@@ -22,9 +23,11 @@ app.get '/authorized/:token', (req, res) ->
         analytics = new Analytics()
         processedData = analytics.process data, 
             includeClosedCards: false
-            onlyAfterDate: moment().subtract(30, 'days').toDate()
-            onlyBeforeDate: moment().subtract(15, 'days').toDate()
-        res.send processedData
+            #onlyAfterDate: moment().subtract(30, 'days').toDate()
+            #onlyBeforeDate: moment().subtract(15, 'days').toDate()
+        res.render 'index', 
+            title: 'Trello Analytics'
+            data: processedData
 
 app.listen 3000, -> 
     console.log('Example app listening on port 3000!')

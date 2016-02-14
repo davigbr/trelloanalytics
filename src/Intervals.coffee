@@ -34,7 +34,7 @@ class Intervals
                 nextAction = null
                 nextActionDate = @now
 
-            timestampDifference = nextActionDate.getTime() - currentActionDate.getTime()
+            timestampDifference = (nextActionDate.getTime() - currentActionDate.getTime()) / (60*60*1000)
 
             if currentAction.type in ['updateCard', 'createCard']
                 currentList = null

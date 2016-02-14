@@ -38,7 +38,6 @@ describe 'Extractor', ->
             extractor = new Extractor data
             combinations = extractor.extractLabelCombinations()
             expect(combinations).to.eql [
-                [],
                 ['1', '2'],
                 ['3'],
                 ['2']
@@ -165,7 +164,6 @@ describe 'Extractor', ->
                     { id: '3', idLabels: [], name: 'Sad Story', closed: false }
                     { id: '4', idLabels: [], name: 'Happy Story', closed: false }
                 ]
-            console.log data.actions[0].data
             extractor = new Extractor data
             cards = extractor.extractCards(onlyAfterDate: new Date '2001-01-01T00:00:00.000Z')
             expect(Object.keys(cards).length).to.be 3
