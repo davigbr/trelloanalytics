@@ -84,7 +84,7 @@ class TrelloFetcher
                         @trello.get "/1/board/#{boardId}/lists/closed", (err, closedLists) =>
                             return callback(err) if err 
 
-                            @trello.get "/1/board/#{boardId}/cards", (err, cards) =>
+                            @trello.get "/1/board/#{boardId}/cards/all", (err, cards) =>
                                 return callback(err) if err 
 
                                 allLists = lists.concat closedLists

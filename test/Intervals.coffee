@@ -70,10 +70,4 @@ describe 'Intervals', ->
             expect(anotherStoryCard.times[todoId]).to.be 5752
             expect(anotherStoryCard.times[doingId]).to.be 8745
 
-        it 'should ignore archived cards by default', ->
-            extractor = new Extractor readDataFile 'archived-card'
-            output = intervals.calculate extractor.extractLists(), extractor.extractCards()
-            expect(Object.keys(output.cards).length).to.be 1
-
-
 

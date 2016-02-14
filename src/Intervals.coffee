@@ -25,11 +25,11 @@ class Intervals
 
         i = 0
         for currentAction in cardActions
-            currentActionDate = new Date(currentAction.date)
+            currentActionDate = new Date currentAction.date
 
             if cardActions[i + 1]
                 nextAction = cardActions[i + 1]
-                nextActionDate = new Date(nextAction.date)
+                nextActionDate = new Date nextAction.date
             else
                 nextAction = null
                 nextActionDate = @now

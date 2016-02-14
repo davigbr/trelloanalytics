@@ -240,6 +240,11 @@
             "id": "56bf71a76a9516ec118adaff",
             "name": "A Story",
             "closed": false
+        },
+         {
+            "id": "56bf71c2366119756581b166",
+            "name": "Another Story",
+            "closed": true
         }
     ]
 }

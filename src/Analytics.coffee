@@ -12,7 +12,7 @@ class Analytics
             cardIds: false
             onlyAfterDate: false
             onlyBeforeDate: false
-            includeArchivedCards: false
+            includeClosedCards: false
         }) -> 
 
         intervals = new Intervals @now
@@ -31,14 +31,15 @@ class Analytics
         output.data = intervals.calculate lists, cards
 
         for combination in labelCombinations
-            if combination.length
-                filter.labelIds = combination
-                labelFilteredCards = extractor.extractCards filter
-                listsAndCards = intervals.calculate lists, labelFilteredCards
-                output.labelFiltered[combination.toString()] = 
-                    labels: extractor.extractLabelsByIds combination
-                    lists: listsAndCards.lists
-                    cards: listsAndCards.cards
+            filter.labelIds = combination
+            labelFilteredCards = extractor.extractCards filter
+            listsAndCards = intervals.calculate lists, labelFilteredCards
+            combinationStr = combination.toString()
+            combinationStr = 'no-labels' if combinationStr is ''
+            output.labelFiltered[combinationStr] = 
+                labels: extractor.extractLabelsByIds combination
+                lists: listsAndCards.lists
+                cards: listsAndCards.cards
 
         return output
 
