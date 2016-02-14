@@ -12,20 +12,63 @@ class Extractor
                 cardActions.push boardAction
 
         cardActions.reverse()
-        return cardActions
+        cardActions
 
-    extractListsById: ->
+    extractLabelsByIds: (ids) ->
+        labels = []
+        for label in @data.labels
+            if label.id in ids
+                labels.push label
+        labels
+
+    extractLabelCombinations: ->
+        combinations = []
+
+        numericArrayEquals = (arr1, arr2) ->
+            if (arr1.length isnt arr2.length)
+                return false
+            i = arr1.length
+            loop
+                if arr1[i] isnt arr2[i]
+                    return false;
+                break if i-- is 0
+            true
+
+        for card in @data.cards
+            combinationPresent = false
+
+            for combination in combinations
+                if numericArrayEquals combination, card.idLabels
+                    combinationPresent = true
+                    break
+
+            if !combinationPresent
+                combinations.push card.idLabels
+
+        combinations
+
+    extractLists: ->
         listsById = {}
         for list in @data.lists
             listsById[list.id] = list
-        return listsById
-        
-    extractCardsById: ->
+        listsById
+
+    extractCards: (filter = {
+            cardIds: false
+            labelIds: false 
+            onlyAfterDate: false
+            onlyBeforeDate: false
+            includeArchivedCards: false
+        }) ->
         cardsById = {}
         for card in @data.cards
-            cardsById[card.id] = card
-        return cardsById
-        
 
+            card.actions = @findCardActions card.id
+            if !filter.cardIds or card.id in filter.cardIds
+
+                # If filtering by label is checked, test if the card contains all specified labels
+                if !filter.labelIds or (filter.labelIds.every (element) -> element in card.idLabels)
+                    cardsById[card.id] = card
+        cardsById
 
 module.exports = Extractor

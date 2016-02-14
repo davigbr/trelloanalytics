@@ -20,8 +20,7 @@ app.get '/authorized/:token', (req, res) ->
 
         analytics = new Analytics()
         processedData = analytics.process data
-        @renderer = new Renderer processedData.lists, processedData.cards
-        res.send @renderer.renderJSON()
+        res.send processedData
 
 app.listen 3000, -> 
     console.log('Example app listening on port 3000!')
