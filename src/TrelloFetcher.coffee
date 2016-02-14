@@ -1,5 +1,4 @@
 Trello = require 'node-trello'
-fs = require 'fs'
 
 class TrelloFetcher
     constructor: (appKey, token) ->
@@ -94,8 +93,6 @@ class TrelloFetcher
                                     actions: @cleanActions actions
                                     lists: @cleanLists allLists
                                     cards: @cleanCards cards
-                                
-                                # fs.writeFileSync 'tmp/data.json', JSON.stringify output, null, 4
                                 
                                 callback null, output
 
