@@ -1,3 +1,53 @@
+mixin metrics(id, title, lists)
+    h2!=title
+
+    div.row
+        div.col-lg-12
+            h3 Flow Metrics
+
+    div.row
+        div.col-lg-12
+            h3 List Metrics
+
+        each list, listId in lists
+            if !list.closed
+                div.col-lg-4
+                    h4
+                    div(id="histogram-" + id + '-' + listId)
+                    script(type="text/javascript").
+                        var data = [{
+                            nbinsx: 10,
+                            x: !{JSON.stringify(list.times.values)},
+                            type: 'histogram'
+                          }
+                        ];
+                        var layout = {
+                            title: '#{list.name}',
+                            xaxis: { title: 'Hours' },
+                            yaxis: { title: 'Number of Items' },
+                            barmode: 'overlay',
+                            bargap: 0.05,
+                            bargroupgap: 0.3
+                        };
+                        Plotly.newPlot('histogram-#{id}-#{listId}', data, layout);
+                    table.table.table-striped
+                        thead
+                            tr
+                                th Count
+                                th Mean
+                                th Median
+                                th Min
+                                th Max
+                        tbody
+                            tr
+                                td!=(list.times.count || 0).toFixed(0) + ' items'
+                                td!=(list.times.mean || 0).toFixed(2) + ' hours'
+                                td!=(list.times.median || 0).toFixed(2) + ' hours'
+                                td!=(list.times.min || 0).toFixed(2) + ' hours'
+                                td!=(list.times.max || 0).toFixed(2) + ' hours'
+
+
+
 doctype html
 html(lang="en")
     head
@@ -27,50 +77,15 @@ html(lang="en")
                 div.main.col-lg-12
                     h1 Trello Analytics
                     ul.nav.nav-tabs(role="tablist")
-                        li(role="presentation" class="active"): a(href="#global" aria-controls="global" role="tab" data-toggle="tab") Global Metrics
-                        li(role="presentation" class="active"): a(href="#no-label" aria-controls="no-label" role="tab" data-toggle="tab") No Label Metrics
+                        li(role="presentation" class="active"): a(href="#global" aria-controls="global" role="tab" data-toggle="tab") Globals
                         each element, index in data.labelFiltered
                             li(role="presentation" class="active")
                                 a(href="#filtered-"+index aria-controls="filtered-!=index" role="tab" data-toggle="tab")!=element.name
                     div.tab-content
                         div#global.tab-pane.active(role="tabpanel") 
-                            h2 Global Metrics
-                            ul.nav.nav-tabs(role="tablist")
-                                each list, listId in data.global.lists
-                                    if !list.closed
-                                        li(role="presentation" class="active"): a(href="#global-list-"+listId aria-controls="global-list-"+listId role="tab" data-toggle="tab")!=list.name
-                            div.tab-content
-                                each list, listId in data.global.lists
-                                    if !list.closed
-                                        div.tab-pane(id="global-list-"+listId role="tabpanel")
-                                            //pre!=JSON.stringify(list.times)
-                                            div(id="histogram-" + listId)
-                                            script(type="text/javascript").
-                                                var data = [{
-                                                    nbinsx: 10,
-                                                    x: !{JSON.stringify(list.times.values)},
-                                                    type: 'histogram'
-                                                  }
-                                                ];
-                                                Plotly.newPlot('histogram-#{listId}', data);
-                                            table.table.table-striped
-                                                thead
-                                                    tr
-                                                        th Mean
-                                                        th Median
-                                                        th Min
-                                                        th Max
-                                                tbody
-                                                    tr
-                                                        td!=list.times.mean.toFixed(2) + ' hours'
-                                                        td!=list.times.median.toFixed(2) + ' hours'
-                                                        td!=list.times.min.toFixed(2) + ' hours'
-                                                        td!=list.times.max.toFixed(2) + ' hours'
-
-                        div#no-label.tab-pane(role="tabpanel")
-                            h2 No Label Metrics
+                            +metrics('global', 'Global', data.global.lists)
 
                         each element, index in data.labelFiltered
-                            div.tab-pane(id="filtered-"+index role="tabpanel") 
-                                h2!=element.name
+                            div.tab-pane(id="filtered-"+index role="tabpanel")
+                                +metrics(index, element.name, data.labelFiltered[index].lists)
 

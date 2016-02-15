@@ -222,12 +222,14 @@
         {
             "id": "56bf71a76a9516ec118adaff",
             "name": "A Story",
-            "closed": false
+            "closed": false,
+            "idList": "56bf6e5fad3b9f2a4daad199"
         },
         {
             "id": "56bf71c2366119756581b166",
             "name": "Another Story...",
-            "closed": false
+            "closed": false,
+            "idList": "56bf6e5fad3b9f2a4daad199"
         }
     ]
 }

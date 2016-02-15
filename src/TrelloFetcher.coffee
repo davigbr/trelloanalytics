@@ -64,6 +64,7 @@ class TrelloFetcher
                 name: card.name
                 closed: card.closed
                 idLabels: card.idLabels
+                idList: card.idList
         cleanedCards
 
     # Fetch a trello board with some related information, like cards, actions and lists

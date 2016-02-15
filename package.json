@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "nodemon": "node_modules/.bin/nodemon app.coffee",
     "start": "node_modules/.bin/coffee app.coffee",
     "test": "node_modules/.bin/mocha -r './inject.coffee' --recursive --compilers coffee:coffee-script/register test"
   },

@@ -2,10 +2,12 @@ moment = require 'moment'
 
 # Extracts and filter some specific data from a Trello board data
 class Extractor
-    constructor: (@data) ->
+    constructor: (@data, @meta = {}) ->
+        @meta.completedStateLists = [] if not Array.isArray @meta.completedStateLists
 
-    findCardActions: (cardId, allowedTypes = ['createCard', 'updateCard']) ->
+    findCardActions: (cardId) ->
         cardActions = []
+        allowedTypes = ['createCard', 'updateCard']
 
         for boardAction in @data.actions
             actionType = boardAction.type
@@ -44,15 +46,26 @@ class Extractor
                     combinationPresent = true
                     break
 
-            if !combinationPresent and card.idLabels.length isnt 0
+            if !combinationPresent
                 combinations.push card.idLabels
 
         combinations
 
-    extractLists: ->
+    extractLists: (states = {}) ->
+        states.open ?= true
+        states.inProgress ?= true
+        states.completed ?= true
+
         listsById = {}
+
         for list in @data.lists
-            listsById[list.id] = list
+            isOpen = list.id in @meta.openStateLists
+            isInProgress = list.id in @meta.inProgressStateLists
+            isCompleted = list.id in @meta.completedStateLists 
+
+            if (states.open and isOpen) or (states.inProgress and isInProgress) or (states.completed and isCompleted)
+                listsById[list.id] = list
+
         listsById
 
     extractCards: (filter = {
@@ -71,6 +84,10 @@ class Extractor
         filter.onlyBeforeDate = false unless filter.onlyBeforeDate instanceof Date
 
         for card in @data.cards
+
+            # Ignore cards that are not in the completed state lists specified in the meta object
+            unless card.idList in @meta.completedStateLists
+                continue
 
             card.actions = @findCardActions card.id
 

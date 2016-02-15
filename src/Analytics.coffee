@@ -3,24 +3,22 @@ Intervals = require './Intervals'
 math = require 'mathjs'
 
 class Analytics
-    constructor: ->
-        @now = new Date()
-
     # Takes data from a Trello board from TrelloFetcher and returns and 
     # object containing lists and cards with processed times
-    process: (data, filter = {
-            cardIds: false
-            onlyAfterDate: false
-            onlyBeforeDate: false
-            includeClosedCards: false
-        }) -> 
+    process: (data, filter = {}, meta = {}) -> 
 
-        intervals = new Intervals @now
-        extractor = new Extractor data
+        now = new Date()
+        intervals = new Intervals now, meta
+        extractor = new Extractor data, meta
 
         labelCombinations = extractor.extractLabelCombinations()
         
-        lists = extractor.extractLists()
+        states = 
+            open: true
+            inProgress: true
+            completed: false
+
+        lists = extractor.extractLists(states)
 
         output = 
             data: {}
@@ -35,14 +33,17 @@ class Analytics
             labelFilteredCards = extractor.extractCards filter
             listsAndCards = intervals.calculate lists, labelFilteredCards
             combinationStr = combination.toString()
-            combinationStr = 'no-labels' if combinationStr is ''
             name = ''
-            labels = extractor.extractLabelsByIds combination
-            for label in labels
-                if name isnt ''
-                    name += ' | ' + label.name 
-                else
-                    name += label.name
+            if combinationStr is ''
+                combinationStr = 'no-labels' 
+                name = 'No Labels'
+            else
+                labels = extractor.extractLabelsByIds combination
+                for label in labels
+                    if name isnt ''
+                        name += ' | ' + label.name 
+                    else
+                        name += label.name
 
             output.labelFiltered[combinationStr] = 
                 name: name

@@ -1,7 +1,7 @@
 math = require 'mathjs'
 
 class Intervals
-    constructor: (@now) -> 
+    constructor: (@now, @meta) -> 
 
     # Takes  card nad lists data and returns and 
     # object containing lists and cards with processed times
@@ -47,6 +47,36 @@ class Intervals
 
             i++
         return listTimes
+
+    calculateFlowMetrics: (lists, cardCount) ->
+        openTimes = 
+            values: math.zeros(cardCount, 1)
+            sum: 0
+            count: cardCount
+        inProgressTimes = 
+            values: math.zeros(cardCount, 1)
+            sum: 0
+            count: cardCount
+
+        for listId, list of lists
+            if listId in @meta.openStateLists
+                openTimes.values = math.add(openTimes.values, list.times.values)
+                openTimes.sum += list.times.sum
+                openTimes.count = list.times.count
+            if listId in @meta.inProgressStateLists
+                inProgressTimes.values = math.add(inProgressTimes.values, list.times.values)
+                inProgressTimes.sum += list.times.sum
+                inProgressTimes.count = list.times.count
+
+        if openTimes.count isnt 0
+            openTimes.mean = openTimes.sum / openTimes.count
+            openTimes.median = math.median openTimes.values
+        if inProgressTimes.count isnt 0
+            inProgressTimes.mean = inProgressTimes.sum / inProgressTimes.count
+            inProgressTimes.median = math.median inProgressTimes.values
+
+        return 
+
 
     # Takes all cards that their times were calculated on each list to sum and get 
     # global sum, count, mean and median metric for each list

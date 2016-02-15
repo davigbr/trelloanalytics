@@ -22,6 +22,50 @@ describe 'Extractor', ->
             actions = extractor.findCardActions cardId
             expect(actions.length).to.be 1
 
+    describe 'extractLists()', ->
+
+        it 'should return only the lists that are specified in the meta object', ->
+            meta = {
+                openStateLists: ['2']
+                inProgressStateLists: ['3']
+                completedStateLists: ['4']
+            }
+            data = 
+                lists: [
+                    { id: '1', name: 'None', closed: false }
+                    { id: '2', name: 'To Do', closed: false }
+                    { id: '3', name: 'Doing', closed: false }
+                    { id: '4', name: 'Done', closed: false }
+                ]
+            extractor = new Extractor data, meta
+            lists = extractor.extractLists()
+            expect(Object.keys(lists).length).to.be 3
+            expect(lists['2'].name).to.be 'To Do'
+            expect(lists['3'].name).to.be 'Doing'
+            expect(lists['4'].name).to.be 'Done'
+
+        it 'should return only the lists that match the specified states', ->
+            meta = {
+                openStateLists: ['2']
+                inProgressStateLists: ['3']
+                completedStateLists: ['4']
+            }
+            data = 
+                lists: [
+                    { id: '1', name: 'None', closed: false }
+                    { id: '2', name: 'To Do', closed: false }
+                    { id: '3', name: 'Doing', closed: false }
+                    { id: '4', name: 'Done', closed: false }
+                ]
+            extractor = new Extractor data, meta
+            states = 
+                open: false
+                inProgress: true
+                completed: false
+            lists = extractor.extractLists(states)
+            expect(Object.keys(lists).length).to.be 1
+            expect(lists['3'].name).to.be 'Doing'
+
     describe 'extractLabelCombinations()', ->
 
         it 'should return all combinations of labels present in the passed cards', ->
@@ -38,6 +82,7 @@ describe 'Extractor', ->
             extractor = new Extractor data
             combinations = extractor.extractLabelCombinations()
             expect(combinations).to.eql [
+                [],
                 ['1', '2'],
                 ['3'],
                 ['2']
@@ -45,14 +90,28 @@ describe 'Extractor', ->
 
     describe 'extractCards()', ->
 
+        meta = completedStateLists: ['3']
+
+        it 'should return only the cards that reached the completed states', ->
+            data = 
+                actions: []
+                cards: [
+                    { id: '1', name: 'A Story', closed: false, idList: '1' },
+                    { id: '2', name: 'Another Story', closed: false, idList: '3' }
+                ]
+            extractor = new Extractor data, meta
+            cards = extractor.extractCards()
+            expect(Object.keys(cards).length).to.be 1
+            expect(cards['2'].name).to.be 'Another Story'
+
         it 'should return all cards by id if no filtering is specified', ->
             data = 
                 actions: []
                 cards: [
-                    { id: '1', name: 'A Story', closed: false },
-                    { id: '2', name: 'Another Story', closed: false }
+                    { id: '1', name: 'A Story', closed: false, idList: '3' },
+                    { id: '2', name: 'Another Story', closed: false, idList: '3' }
                 ]
-            extractor = new Extractor data
+            extractor = new Extractor data, meta
             cards = extractor.extractCards()
             expect(Object.keys(cards).length).to.be 2
             expect(cards['1'].name).to.be 'A Story'
@@ -62,12 +121,12 @@ describe 'Extractor', ->
             data = 
                 actions: []
                 cards: [
-                    { id: '1', name: 'A Story', closed: false }
-                    { id: '2', name: 'Another Story', closed: false }
-                    { id: '3', name: 'Sad Story', closed: false }
-                    { id: '4', name: 'Happy Story', closed: false }
+                    { id: '1', name: 'A Story', closed: false, idList: '3' }
+                    { id: '2', name: 'Another Story', closed: false, idList: '3' }
+                    { id: '3', name: 'Sad Story', closed: false, idList: '3' }
+                    { id: '4', name: 'Happy Story', closed: false, idList: '3' }
                 ]
-            extractor = new Extractor data
+            extractor = new Extractor data, meta
             cards = extractor.extractCards(cardIds: ['3', '2'])
             expect(Object.keys(cards).length).to.be 2
             expect(cards['2'].name).to.be 'Another Story'
@@ -77,12 +136,12 @@ describe 'Extractor', ->
             data = 
                 actions: []
                 cards: [
-                    { id: '1', idLabels: [], name: 'A Story', closed: false }
-                    { id: '2', idLabels: ['1', '2'], name: 'Another Story', closed: false }
-                    { id: '3', idLabels: ['3'], name: 'Sad Story', closed: false }
-                    { id: '4', idLabels: ['2'], name: 'Happy Story', closed: false }
+                    { id: '1', idLabels: [], name: 'A Story', closed: false, idList: '3' }
+                    { id: '2', idLabels: ['1', '2'], name: 'Another Story', closed: false, idList: '3' }
+                    { id: '3', idLabels: ['3'], name: 'Sad Story', closed: false, idList: '3' }
+                    { id: '4', idLabels: ['2'], name: 'Happy Story', closed: false, idList: '3' }
                 ]
-            extractor = new Extractor data
+            extractor = new Extractor data, meta, meta
             cards = extractor.extractCards(labelIds: ['1', '2'])
             expect(Object.keys(cards).length).to.be 1
             expect(cards['2'].name).to.be 'Another Story'
@@ -91,12 +150,12 @@ describe 'Extractor', ->
             data = 
                 actions: []
                 cards: [
-                    { id: '1', idLabels: [], name: 'A Story', closed: false }
-                    { id: '2', idLabels: ['1', '2'], name: 'Another Story', closed: false }
-                    { id: '3', idLabels: ['3'], name: 'Sad Story', closed: false }
-                    { id: '4', idLabels: ['2'], name: 'Happy Story', closed: false }
+                    { id: '1', idLabels: [], name: 'A Story', closed: false, idList: '3' }
+                    { id: '2', idLabels: ['1', '2'], name: 'Another Story', closed: false, idList: '3' }
+                    { id: '3', idLabels: ['3'], name: 'Sad Story', closed: false, idList: '3' }
+                    { id: '4', idLabels: ['2'], name: 'Happy Story', closed: false, idList: '3' }
                 ]
-            extractor = new Extractor data
+            extractor = new Extractor data, meta
             cards = extractor.extractCards(labelIds: [])
             expect(Object.keys(cards).length).to.be 1
             expect(cards['1'].name).to.be 'A Story'
@@ -105,12 +164,12 @@ describe 'Extractor', ->
             data = 
                 actions: []
                 cards: [
-                    { id: '1', idLabels: [], name: 'A Story', closed: false }
-                    { id: '2', idLabels: [], name: 'Another Story', closed: true }
-                    { id: '3', idLabels: [], name: 'Sad Story', closed: true }
-                    { id: '4', idLabels: [], name: 'Happy Story', closed: false }
+                    { id: '1', idLabels: [], name: 'A Story', closed: false, idList: '3' }
+                    { id: '2', idLabels: [], name: 'Another Story', closed: true, idList: '3' }
+                    { id: '3', idLabels: [], name: 'Sad Story', closed: true, idList: '3' }
+                    { id: '4', idLabels: [], name: 'Happy Story', closed: false, idList: '3' }
                 ]
-            extractor = new Extractor data
+            extractor = new Extractor data, meta
             cards = extractor.extractCards()
             expect(Object.keys(cards).length).to.be 2
             expect(cards['1'].name).to.be 'A Story'
@@ -120,12 +179,12 @@ describe 'Extractor', ->
             data = 
                 actions: []
                 cards: [
-                    { id: '1', idLabels: [], name: 'A Story', closed: false }
-                    { id: '2', idLabels: [], name: 'Another Story', closed: true }
-                    { id: '3', idLabels: [], name: 'Sad Story', closed: true }
-                    { id: '4', idLabels: [], name: 'Happy Story', closed: false }
+                    { id: '1', idLabels: [], name: 'A Story', closed: false, idList: '3' }
+                    { id: '2', idLabels: [], name: 'Another Story', closed: true, idList: '3' }
+                    { id: '3', idLabels: [], name: 'Sad Story', closed: true, idList: '3' }
+                    { id: '4', idLabels: [], name: 'Happy Story', closed: false, idList: '3' }
                 ]
-            extractor = new Extractor data
+            extractor = new Extractor data, meta
             cards = extractor.extractCards(includeClosedCards: true)
             expect(Object.keys(cards).length).to.be 4
             expect(cards['1'].name).to.be 'A Story'
@@ -137,12 +196,12 @@ describe 'Extractor', ->
             data = 
                 actions: []
                 cards: [
-                    { id: '1', idLabels: [], name: 'A Story', closed: false }
-                    { id: '2', idLabels: [], name: 'Another Story', closed: true }
-                    { id: '3', idLabels: [], name: 'Sad Story', closed: true }
-                    { id: '4', idLabels: [], name: 'Happy Story', closed: false }
+                    { id: '1', idLabels: [], name: 'A Story', closed: false, idList: '3' }
+                    { id: '2', idLabels: [], name: 'Another Story', closed: true, idList: '3' }
+                    { id: '3', idLabels: [], name: 'Sad Story', closed: true, idList: '3' }
+                    { id: '4', idLabels: [], name: 'Happy Story', closed: false, idList: '3' }
                 ]
-            extractor = new Extractor data
+            extractor = new Extractor data, meta
             cards = extractor.extractCards(includeClosedCards: true)
             expect(Object.keys(cards).length).to.be 4
             expect(cards['1'].name).to.be 'A Story'
@@ -159,12 +218,12 @@ describe 'Extractor', ->
                     { id: '4', type: 'createCard', date: '2004-01-01T00:00:00.000Z', data: card: id: '4' }               
                 ]
                 cards: [
-                    { id: '1', idLabels: [], name: 'A Story', closed: false }
-                    { id: '2', idLabels: [], name: 'Another Story', closed: false }
-                    { id: '3', idLabels: [], name: 'Sad Story', closed: false }
-                    { id: '4', idLabels: [], name: 'Happy Story', closed: false }
+                    { id: '1', idLabels: [], name: 'A Story', closed: false, idList: '3' }
+                    { id: '2', idLabels: [], name: 'Another Story', closed: false, idList: '3' }
+                    { id: '3', idLabels: [], name: 'Sad Story', closed: false, idList: '3' }
+                    { id: '4', idLabels: [], name: 'Happy Story', closed: false, idList: '3' }
                 ]
-            extractor = new Extractor data
+            extractor = new Extractor data, meta
             cards = extractor.extractCards(onlyAfterDate: new Date '2001-01-01T00:00:00.000Z')
             expect(Object.keys(cards).length).to.be 3
             expect(cards['2'].name).to.be 'Another Story'
@@ -180,12 +239,12 @@ describe 'Extractor', ->
                     { id: '4', type: 'createCard', date: '2004-01-01T00:00:00.000Z', data: card: id: '4' }
                 ]
                 cards: [
-                    { id: '1', idLabels: [], name: 'A Story', closed: false }
-                    { id: '2', idLabels: [], name: 'Another Story', closed: false }
-                    { id: '3', idLabels: [], name: 'Sad Story', closed: false }
-                    { id: '4', idLabels: [], name: 'Happy Story', closed: false }
+                    { id: '1', idLabels: [], name: 'A Story', closed: false, idList: '3' }
+                    { id: '2', idLabels: [], name: 'Another Story', closed: false, idList: '3' }
+                    { id: '3', idLabels: [], name: 'Sad Story', closed: false, idList: '3' }
+                    { id: '4', idLabels: [], name: 'Happy Story', closed: false, idList: '3' }
                 ]
-            extractor = new Extractor data
+            extractor = new Extractor data, meta
             cards = extractor.extractCards(onlyBeforeDate: new Date '2002-01-01T00:00:00.000Z')
             expect(Object.keys(cards).length).to.be 1
             expect(cards['1'].name).to.be 'A Story'

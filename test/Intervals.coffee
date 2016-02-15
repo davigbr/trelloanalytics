@@ -15,15 +15,19 @@ describe 'Intervals', ->
         aStoryCardId = '56bf71a76a9516ec118adaff'
         anotherStoryCardId = '56bf71c2366119756581b166'
 
-        intervals = new Intervals(new Date());
+        meta = 
+            openStateLists: ['56bf6e598230d139680a48ce']
+            inProgressStateLists: ['56bf6e5d41428906562f4aee']
+            completedStateLists: ['56bf6e5fad3b9f2a4daad199']
+        intervals = new Intervals(new Date(), meta)
 
         it 'should return an empty object if there are no lists', ->
-            extractor = new Extractor readDataFile 'empty-board'
+            extractor = new Extractor readDataFile('empty-board'), meta
             output = intervals.calculate extractor.extractLists(), extractor.extractCards()
             expect(output.lists).to.be.empty()
 
         it 'should return all lists with zeroed times if there are no actions, just lists', ->
-            extractor = new Extractor readDataFile 'just-lists-no-actions'
+            extractor = new Extractor readDataFile('just-lists-no-actions'), meta
             output = intervals.calculate extractor.extractLists(), extractor.extractCards()
             expect(Object.keys(output.lists).length).to.be 3
 
@@ -40,7 +44,7 @@ describe 'Intervals', ->
         msInAnHr = 60 * 60 * 1000
 
         it 'should calculate the list times correctly', ->
-            extractor = new Extractor readDataFile 'few-actions'
+            extractor = new Extractor readDataFile('few-actions'), meta
             output = intervals.calculate extractor.extractLists(), extractor.extractCards()
             todo = output.lists[todoId]
             doing = output.lists[doingId]
@@ -62,7 +66,7 @@ describe 'Intervals', ->
             expect(doing.times.values).to.eql [10514 / msInAnHr, 8745 / msInAnHr]
 
         it 'should calculate the card times correctly', ->
-            extractor = new Extractor readDataFile 'few-actions'
+            extractor = new Extractor readDataFile('few-actions'), meta
             output = intervals.calculate extractor.extractLists(), extractor.extractCards()
             aStoryCard = output.cards[aStoryCardId]
             anotherStoryCard = output.cards[anotherStoryCardId]
