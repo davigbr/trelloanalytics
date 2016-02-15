@@ -1,5 +1,13 @@
-mixin metrics(id, title, lists)
-    h2!=title
+mixin metrics(id, title, lists, labels)
+    div.row
+        div.col-lg-12
+            //if labels
+            //    br
+            //    each label, index in labels
+            //        span.label(style="font-size: 15px; background-color: " + label.color)!=label.name
+            //        &nbsp;
+            //else
+            h2!=title
 
     div.row
         div.col-lg-12
@@ -12,7 +20,6 @@ mixin metrics(id, title, lists)
         each list, listId in lists
             if !list.closed
                 div.col-lg-4
-                    h4
                     div(id="histogram-" + id + '-' + listId)
                     script(type="text/javascript").
                         var data = [{
@@ -51,6 +58,8 @@ mixin metrics(id, title, lists)
 doctype html
 html(lang="en")
     head
+        meta(charset="utf-8")
+
         script(type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js")
         script(type="text/javascript" src="//d3js.org/d3.v3.min.js" charset="utf-8")
         script(type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous")
@@ -68,7 +77,6 @@ html(lang="en")
 
         title!=title
 
-        meta(charset="utf-8")
         meta(http-equiv="X-UA-Compatible" content="IE=edge")
         meta(name="viewport" content="width=device-width, initial-scale=1")
     body
@@ -80,12 +88,12 @@ html(lang="en")
                         li(role="presentation" class="active"): a(href="#global" aria-controls="global" role="tab" data-toggle="tab") Globals
                         each element, index in data.labelFiltered
                             li(role="presentation" class="active")
-                                a(href="#filtered-"+index aria-controls="filtered-!=index" role="tab" data-toggle="tab")!=element.name
+                                a(href="#filtered-"+index.replace(',', '-') aria-controls="filtered-#{index.replace(',', '-')}" role="tab" data-toggle="tab")!=element.name
                     div.tab-content
                         div#global.tab-pane.active(role="tabpanel") 
                             +metrics('global', 'Global', data.global.lists)
 
                         each element, index in data.labelFiltered
-                            div.tab-pane(id="filtered-"+index role="tabpanel")
-                                +metrics(index, element.name, data.labelFiltered[index].lists)
+                            div.tab-pane(id="filtered-"+index.replace(',', '-') role="tabpanel")
+                                +metrics(index, element.name, data.labelFiltered[index].lists, data.labelFiltered[index].labels)
 
