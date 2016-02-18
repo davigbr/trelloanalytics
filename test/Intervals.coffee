@@ -15,7 +15,7 @@ describe 'Intervals', ->
         aStoryCardId = '56bf71a76a9516ec118adaff'
         anotherStoryCardId = '56bf71c2366119756581b166'
 
-        meta = 
+        meta =
             openStateLists: ['56bf6e598230d139680a48ce']
             inProgressStateLists: ['56bf6e5d41428906562f4aee']
             completedStateLists: ['56bf6e5fad3b9f2a4daad199']
@@ -42,6 +42,14 @@ describe 'Intervals', ->
                 expect(list.times.min).to.be null
 
         msInAnHr = 60 * 60 * 1000
+
+        it 'should calculate the flow times correctly', ->
+            extractor = new Extractor readDataFile('few-actions'), meta
+            output = intervals.calculate extractor.extractLists(), extractor.extractCards()
+
+            expect(output.flow.cycle.median).to.be 0.004443333333333333
+            expect(output.flow.lead.median).to.be 0.0026748611111111114
+            expect(output.flow.reaction.median).to.be 0.0017684722222222223
 
         it 'should calculate the list times correctly', ->
             extractor = new Extractor readDataFile('few-actions'), meta
@@ -70,7 +78,7 @@ describe 'Intervals', ->
             output = intervals.calculate extractor.extractLists(), extractor.extractCards()
             aStoryCard = output.cards[aStoryCardId]
             anotherStoryCard = output.cards[anotherStoryCardId]
-            
+
             expect(aStoryCard.times[todoId]).to.be 6981 / msInAnHr
             expect(aStoryCard.times[doingId]).to.be 10514 / msInAnHr
             expect(anotherStoryCard.times[todoId]).to.be 5752 / msInAnHr

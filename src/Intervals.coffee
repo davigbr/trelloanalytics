@@ -1,9 +1,9 @@
 math = require 'mathjs'
 
 class Intervals
-    constructor: (@now, @meta) -> 
+    constructor: (@now, @meta) ->
 
-    # Takes  card nad lists data and returns and 
+    # Takes  card nad lists data and returns and
     # object containing lists and cards with processed times
     calculate: (lists, cards) ->
         # Makes a copy of the passed objects
@@ -13,7 +13,13 @@ class Intervals
         for cardId, card of cards
             cards[cardId].times = @calculateCardTimes lists, card.actions
         @calculateListsTimes lists, cards
-        return lists: lists, cards: cards
+        flow = @calculateFlowMetrics lists, Object.keys(cards).length
+        {
+            lists: lists
+            cards: cards
+            flow: flow
+        }
+
 
     # Takes all actions from a specific card to count the time a card remained on each list
     # Return an object containing all lists with the time spent on each
@@ -40,7 +46,7 @@ class Intervals
                 currentList = null
                 if currentAction.data.list
                     currentList = currentAction.data.list
-                else 
+                else
                     currentList = currentAction.data.listAfter
 
                 listTimes[currentList.id] += timestampDifference
@@ -49,41 +55,56 @@ class Intervals
         return listTimes
 
     calculateFlowMetrics: (lists, cardCount) ->
-        openTimes = 
-            values: math.zeros(cardCount, 1)
+        reaction =
+            values: math.zeros(cardCount)
             sum: 0
             count: cardCount
-        inProgressTimes = 
-            values: math.zeros(cardCount, 1)
+        lead =
+            values: math.zeros(cardCount)
+            sum: 0
+            count: cardCount
+        cycle =
+            values: math.zeros(cardCount)
             sum: 0
             count: cardCount
 
         for listId, list of lists
-            if listId in @meta.openStateLists
-                openTimes.values = math.add(openTimes.values, list.times.values)
-                openTimes.sum += list.times.sum
-                openTimes.count = list.times.count
-            if listId in @meta.inProgressStateLists
-                inProgressTimes.values = math.add(inProgressTimes.values, list.times.values)
-                inProgressTimes.sum += list.times.sum
-                inProgressTimes.count = list.times.count
+            isOpen = listId in @meta.openStateLists
+            isInProgress = listId in @meta.inProgressStateLists
 
-        if openTimes.count isnt 0
-            openTimes.mean = openTimes.sum / openTimes.count
-            openTimes.median = math.median openTimes.values
-        if inProgressTimes.count isnt 0
-            inProgressTimes.mean = inProgressTimes.sum / inProgressTimes.count
-            inProgressTimes.median = math.median inProgressTimes.values
+            if isOpen or isInProgress
+                cycle.values = math.add(cycle.values, math.matrix(list.times.values))
+                cycle.sum += list.times.sum
 
-        return 
+            if isOpen
+                reaction.values = math.add(reaction.values, math.matrix(list.times.values))
+                reaction.sum += list.times.sum
+            else if isInProgress
+                lead.values = math.add(lead.values, math.matrix(list.times.values))
+                lead.sum += list.times.sum
 
+        reaction.values = reaction.values.toArray()
+        lead.values = lead.values.toArray()
+        cycle.values = cycle.values.toArray()
 
-    # Takes all cards that their times were calculated on each list to sum and get 
+        if reaction.count isnt 0
+            reaction.mean = reaction.sum / reaction.count
+            reaction.median = math.median reaction.values
+        if lead.count isnt 0
+            lead.mean = lead.sum / lead.count
+            lead.median = math.median lead.values
+        if cycle.count isnt 0
+            cycle.mean = cycle.sum / cycle.count
+            cycle.median = math.median cycle.values
+
+        return reaction: reaction, lead: lead, cycle: cycle
+
+    # Takes all cards that their times were calculated on each list to sum and get
     # global sum, count, mean and median metric for each list
     calculateListsTimes: (lists, cards) ->
         listTimes = {}
         for listId, list of lists
-            list.times = 
+            list.times =
                 sum: 0,
                 count: 0,
                 mean: null,

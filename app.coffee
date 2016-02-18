@@ -1,4 +1,4 @@
-express = require 'express' 
+express = require 'express'
 moment = require 'moment'
 app = express()
 
@@ -30,14 +30,16 @@ app.get '/:boardId/:token', (req, res) ->
     boardId = req.params.boardId
 
     fetcher = new TrelloFetcher appKey, token
-    fetcher.loadBoard boardId, (err, data) -> 
-        return res.send(err) if err
+    fetcher.loadBoard boardId, (err, data) ->
+        if err
+            res.render 'unauthorized'
+            return
 
         filter =
             includeClosedCards: false
             #onlyAfterDate: moment().subtract(30, 'days').toDate()
             #onlyBeforeDate: moment().subtract(15, 'days').toDate()
-        meta = 
+        meta =
             openStateLists: ['5653778d17e93e7e24cbb423'] # Ready
             inProgressStateLists: [
                 '564c56c8122370159de93e46', # Development
@@ -51,9 +53,9 @@ app.get '/:boardId/:token', (req, res) ->
             ]
         analytics = new Analytics()
         processedData = analytics.process data, filter, meta
-        res.render 'dashboard', 
+        res.render 'dashboard',
             title: 'Trello Analytics'
             data: processedData
 
-app.listen app.get('port'), '0.0.0.0', -> 
+app.listen app.get('port'), '0.0.0.0', ->
     console.log 'Example app listening on port ' + app.get('port') + '!'
