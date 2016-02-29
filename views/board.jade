@@ -33,5 +33,14 @@ html(lang="en")
                             select.form-control(id="boardId" name="id")
                                 each board in boards
                                     option(value="#{board.id}")!=board.name
-                            &nbsp;
-                        button.btn.btn-default(type='submit') Select
+                            br
+                            br
+                            label(for='afterDate') After Date:
+                            input#afterDate.form-control(name="afterDate" type="date")
+                            br
+                            br
+                            label(for='beforeDate') Before Date:
+                            input#beforeDate.form-control(name="beforeDate" type="date")
+                            br
+                            br
+                            button.btn.btn-default(type='submit') Select

@@ -28,10 +28,12 @@ app.get '/board', (req, res) ->
 app.get '/authorized/board/:token/', (req, res) ->
     token = req.params.token
     boardId = req.query['id']
+    beforeDate = req.query['beforeDate']
+    afterDate = req.query['afterDate']
 
     # Board already selected
     if boardId
-        res.redirect "/authorized/board/#{token}/#{boardId}"
+        res.redirect "/authorized/board/#{token}/#{boardId}?beforeDate=#{beforeDate}&afterDate={#{afterDate}"
 
     # Board not selected yet
     else
@@ -50,6 +52,14 @@ app.get '/authorized/board/:token/:boardId', (req, res) ->
     token = req.params.token
     boardId = req.params.boardId
 
+    onlyAfterDate = moment(req.query['afterDate'], 'YYYY-MM-DD')
+    onlyBeforeDate = moment(req.query['beforeDate'], 'YYYY-MM-DD')
+
+    if onlyAfterDate.isValid()
+        onlyAfterDate = onlyAfterDate.toDate()
+    if onlyBeforeDate.isValid()
+        onlyBeforeDate = onlyBeforeDate.toDate()
+
     fetcher = new TrelloFetcher appKey, token
     fetcher.loadBoard boardId, (err, data) ->
         if err
@@ -59,8 +69,8 @@ app.get '/authorized/board/:token/:boardId', (req, res) ->
 
         filter =
             includeClosedCards: false
-            #onlyAfterDate: moment().subtract(30, 'days').toDate()
-            #onlyBeforeDate: moment().subtract(15, 'days').toDate()
+            onlyAfterDate: onlyAfterDate
+            onlyBeforeDate: onlyBeforeDate
         meta =
             openStateLists: ['5653778d17e93e7e24cbb423'] # Ready
             inProgressStateLists: [
