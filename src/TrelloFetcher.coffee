@@ -4,6 +4,12 @@ class TrelloFetcher
     constructor: (appKey, token) ->
         @trello = new Trello appKey, token
 
+    # List boards for selection
+    listBoards: (callback) ->
+        @trello.get "/1/members/me/boards", (err, boards) =>
+            return callback(err) if err
+            callback null, boards
+
     # Remove unwanted properties from board
     cleanBoard: (board) -> id: board.id, name: board.name
 
@@ -21,13 +27,13 @@ class TrelloFetcher
     cleanActions: (actions) ->
         cleanedActions = []
         for action in actions
-            cleanedAction = 
+            cleanedAction =
                 id: action.id
                 type: action.type
                 date: action.date
 
             if action.data
-                cleanedAction.data = {} 
+                cleanedAction.data = {}
 
                 if action.data.list
                     cleanedAction.data.list = action.data.list
@@ -36,10 +42,10 @@ class TrelloFetcher
                 if action.data.listBefore
                     cleanedAction.data.listBefore = action.data.listBefore
                 if action.data.board
-                    cleanedAction.data.board = 
-                        id: action.data.board.id 
+                    cleanedAction.data.board =
+                        id: action.data.board.id
                 if action.data.card
-                    cleanedAction.data.card = 
+                    cleanedAction.data.card =
                         id: action.data.card.id
 
             cleanedActions.push cleanedAction
@@ -59,7 +65,7 @@ class TrelloFetcher
     cleanCards: (cards) ->
         cleanedCards = []
         for card in cards
-            cleanedCards.push 
+            cleanedCards.push
                 id: card.id
                 name: card.name
                 closed: card.closed
@@ -70,31 +76,31 @@ class TrelloFetcher
     # Fetch a trello board with some related information, like cards, actions and lists
     loadBoard: (boardId, callback) ->
         @trello.get "/1/board/#{boardId}", (err, board) =>
-            return callback(err) if err 
-    
+            return callback(err) if err
+
             @trello.get "/1/board/#{boardId}/labels", (err, labels) =>
-                return callback(err) if err 
+                return callback(err) if err
 
                 @trello.get "/1/board/#{boardId}/actions?limit=1000", (err, actions) =>
-                    return callback(err) if err 
+                    return callback(err) if err
 
                     @trello.get "/1/board/#{boardId}/lists", (err, lists) =>
-                        return callback(err) if err 
+                        return callback(err) if err
 
                         @trello.get "/1/board/#{boardId}/lists/closed", (err, closedLists) =>
-                            return callback(err) if err 
+                            return callback(err) if err
 
                             @trello.get "/1/board/#{boardId}/cards/all", (err, cards) =>
-                                return callback(err) if err 
+                                return callback(err) if err
 
                                 allLists = lists.concat closedLists
-                                output = 
+                                output =
                                     board: @cleanBoard board
                                     labels: @cleanLabels labels
                                     actions: @cleanActions actions
                                     lists: @cleanLists allLists
                                     cards: @cleanCards cards
-                                
+
                                 callback null, output
 
 module.exports = TrelloFetcher

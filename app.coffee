@@ -6,33 +6,55 @@ TrelloFetcher = require './src/TrelloFetcher'
 Analytics = require './src/Analytics'
 Renderer = require './src/Renderer'
 
+appKey = 'cb7acdb2fee72c75964b52f7888feee0'
+
 app.use express.static 'static'
 app.set 'view engine', 'jade'
 
 app.set 'port', process.env.PORT or 3000
 
 app.get '/', (req, res) ->
-    res.redirect '/board'
+    res.redirect '/auth'
 
-app.get '/auth/:boardId', (req, res) ->
-    res.render 'auth', boardId: req.params.boardId
+app.get '/auth/', (req, res) ->
+    res.render 'auth'
 
 app.get '/board', (req, res) ->
     if req.query['id']?
         res.redirect '/auth/' + req.query['id']
     else
-        res.render 'board'
 
-app.get '/:boardId/:token', (req, res) ->
+# Fetch boards and list them in the user interface
+app.get '/authorized/board/:token/', (req, res) ->
+    token = req.params.token
+    boardId = req.query['id']
+
+    # Board already selected
+    if boardId
+        res.redirect "/authorized/board/#{token}/#{boardId}"
+
+    # Board not selected yet
+    else
+        fetcher = new TrelloFetcher appKey, token
+        fetcher.listBoards (err, data) ->
+            if err
+                app.locals.error = err
+                console.log err
+                res.render 'error'
+                return
+            app.locals.boards = data
+            res.render 'board'
+
+app.get '/authorized/board/:token/:boardId', (req, res) ->
 
     token = req.params.token
-    appKey = 'cb7acdb2fee72c75964b52f7888feee0'
     boardId = req.params.boardId
 
     fetcher = new TrelloFetcher appKey, token
     fetcher.loadBoard boardId, (err, data) ->
         if err
-            res.render 'unauthorized'
+            app.locals.error = err
+            res.render 'error'
             return
 
         filter =

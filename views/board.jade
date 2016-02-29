@@ -26,10 +26,12 @@ html(lang="en")
             div.row
                 div.col-lg-12
                     h1 Trello Analytics
+
                     form.form-inline(method='get')
                         .form-group
-                            label(for='boardId') Please type your board id from the url: &nbsp;
-                            input#boardId.form-control(name='id' type='text' placeholder='Board id')
+                            label(for='boardId') Please select a board: &nbsp;
+                            select.form-control(id="boardId" name="id")
+                                each board in boards
+                                    option(value="#{board.id}")!=board.name
+                            &nbsp;
                         button.btn.btn-default(type='submit') Select
-                    br 
-                    p For example, the id for the url #[strong!='https://trello.com/b/lS6D7U5T/my-board'] is #[strong lS6D7U5T] 

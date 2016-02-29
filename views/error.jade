@@ -1,0 +1,13 @@
+doctype html
+html(lang="en")
+    head
+    body
+        script(type="text/javascript").
+            function tryAgain() {
+                delete localStorage['trello_token'];
+                window.location.href = '/'
+            }
+    h1 Error
+    p #{error}
+    p
+        a(href="#" onclick="tryAgain()") Try Again

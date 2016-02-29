@@ -7,9 +7,9 @@ html(lang="en")
             (function(){
                 var authenticationSuccess = function(param) {
                     $('#message').html('Authenticating...');
-                    window.location.href = '/#{boardId}/' + localStorage['trello_token'];
+                    window.location.href = '/authorized/board/' + localStorage['trello_token'];
                 };
-                var authenticationFailure = function() { 
+                var authenticationFailure = function() {
                     delete localStorage['trello_token'];
                     $('#message').html('Authentication failed. Please try again reloading the page.');
                 };
