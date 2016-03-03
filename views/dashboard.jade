@@ -16,7 +16,23 @@ mixin histogram(id, title, data)
         };
         Plotly.newPlot('histogram-#{id}', data, layout);
 
-mixin timetable(times)
+mixin card-flow-table(cards)
+    table.table.table-striped.table-condensed
+        thead
+            tr
+                th Name
+                th Reaction
+                th Lead
+                th Cycle
+        tbody
+            each card in cards
+                tr
+                    td!=card.name
+                    td!=card.flow.reaction
+                    td!=card.flow.lead
+                    td!=card.flow.cycle
+
+mixin list-time-table(times)
     table.table.table-striped
         thead
             tr
@@ -53,16 +69,14 @@ mixin metrics(id, title, data)
                 h3 Flow Metrics
         div.row
             div.col-md-4
-                +histogram(id + '-reaction', 'Reaction Time', data.flow.reaction.values)
-                +timetable(data.flow.reaction)
-
+                    +histogram(id + '-reaction', 'Reaction Time', data.flow.reaction.values)
+                    +list-time-table(data.flow.reaction)
             div.col-md-4
-                +histogram(id + '-lead', 'Lead Time', data.flow.lead.values)
-                +timetable(data.flow.lead)
-
+                    +histogram(id + '-lead', 'Lead Time', data.flow.lead.values)
+                    +list-time-table(data.flow.lead)
             div.col-md-4
-                +histogram(id + '-cycle', 'Cycle Time', data.flow.cycle.values)
-                +timetable(data.flow.reaction)
+                    +histogram(id + '-cycle', 'Cycle Time', data.flow.cycle.values)
+                    +list-time-table(data.flow.cycle)
 
     div.row
         div.col-md-12
@@ -72,7 +86,10 @@ mixin metrics(id, title, data)
             if !list.closed
                 div.col-md-4
                     +histogram(id + '-' + listId, list.name, list.times.values)
-                    +timetable(list.times)
+                    +list-time-table(list.times)
+    div.row
+        div.col-md-12
+            +card-flow-table(data.cards)
 
 doctype html
 html(lang="en")

@@ -12,14 +12,18 @@ class Intervals
 
         for cardId, card of cards
             cards[cardId].times = @calculateCardTimes lists, card.actions
-        @calculateListsTimes lists, cards
-        flow = @calculateFlowMetrics lists, Object.keys(cards).length
+            cards[cardId].flow = @calculateCardFlow lists, card
+
+        @calculateListTimes lists, cards
+        flow = @calculateListFlow lists, Object.keys(cards).length
         {
             lists: lists
             cards: cards
             flow: flow
         }
 
+    calculateCardFlow: (lists, card) ->
+        return reaction: 0, lead: 0, cycle: 0
 
     # Takes all actions from a specific card to count the time a card remained on each list
     # Return an object containing all lists with the time spent on each
@@ -54,19 +58,25 @@ class Intervals
             i++
         return listTimes
 
-    calculateFlowMetrics: (lists, cardCount) ->
+    calculateListFlow: (lists, cardCount) ->
         reaction =
             values: math.zeros(cardCount)
             sum: 0
             count: cardCount
+            mean: null
+            median: null
         lead =
             values: math.zeros(cardCount)
             sum: 0
             count: cardCount
+            mean: null
+            median: null
         cycle =
             values: math.zeros(cardCount)
             sum: 0
             count: cardCount
+            mean: null
+            median: null
 
         for listId, list of lists
             isOpen = listId in @meta.openStateLists
@@ -101,7 +111,7 @@ class Intervals
 
     # Takes all cards that their times were calculated on each list to sum and get
     # global sum, count, mean and median metric for each list
-    calculateListsTimes: (lists, cards) ->
+    calculateListTimes: (lists, cards) ->
         listTimes = {}
         for listId, list of lists
             list.times =

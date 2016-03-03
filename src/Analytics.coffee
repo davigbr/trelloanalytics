@@ -1,26 +1,34 @@
 Extractor = require './Extractor'
 Intervals = require './Intervals'
+MetaDataReader = require './MetaDataReader'
 math = require 'mathjs'
 
 class Analytics
-    # Takes data from a Trello board from TrelloFetcher and returns and 
+
+    autoDetectMetaData: (lists) ->
+        console.log lists
+
+    # Takes data from a Trello board from TrelloFetcher and returns and
     # object containing lists and cards with processed times
-    process: (data, filter = {}, meta = {}) -> 
+    process: (data, filter = {}) ->
+
+        metaDataReader = new MetaDataReader()
+        listMeta = metaDataReader.readListMeta data.lists
 
         now = new Date()
-        intervals = new Intervals now, meta
-        extractor = new Extractor data, meta
+        intervals = new Intervals now, listMeta
+        extractor = new Extractor data, listMeta
 
         labelCombinations = extractor.extractLabelCombinations()
-        
-        states = 
+
+        states =
             open: true
             inProgress: true
             completed: false
 
         lists = extractor.extractLists(states)
 
-        output = 
+        output =
             data: {}
             labelFiltered: {}
 
@@ -35,21 +43,22 @@ class Analytics
             combinationStr = combination.toString()
             name = ''
             if combinationStr is ''
-                combinationStr = 'no-labels' 
+                combinationStr = 'no-labels'
                 name = 'No Labels'
             else
                 labels = extractor.extractLabelsByIds combination
                 for label in labels
                     if name isnt ''
-                        name += ' | ' + label.name 
+                        name += ' | ' + label.name
                     else
                         name += label.name
 
-            output.labelFiltered[combinationStr] = 
+            output.labelFiltered[combinationStr] =
                 name: name
                 labels: labels
                 lists: listsAndCards.lists
                 cards: listsAndCards.cards
+                flow: listsAndCards.flow
 
         return output
 

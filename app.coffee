@@ -71,20 +71,8 @@ app.get '/authorized/board/:token/:boardId', (req, res) ->
             includeClosedCards: false
             onlyAfterDate: onlyAfterDate
             onlyBeforeDate: onlyBeforeDate
-        meta =
-            openStateLists: ['5653778d17e93e7e24cbb423'] # Ready
-            inProgressStateLists: [
-                '564c56c8122370159de93e46', # Development
-                '5653786f65d65d03d0081b6b' # Accepting
-            ]
-            completedStateLists: [
-                '564c56c953051756426bb817', # Done
-                '56b09c115eaeb2409784c9ab', # Reviewed 12/02
-                '56af4192b26d3c92c5f94999', # Reviewed 19/01
-                '56798aa8172854cd7a3c2cc6' # Reviewed 15/01
-            ]
         analytics = new Analytics()
-        processedData = analytics.process data, filter, meta
+        processedData = analytics.process data, filter
         res.render 'dashboard',
             title: 'Trello Analytics'
             data: processedData
