@@ -18,7 +18,15 @@ class Extractor
         cardActions.reverse()
         cardActions
 
-    extractLabelsByIds: (ids) ->
+    # Return all board labels in a array where the key is the label id
+    extractLabelsById: ->
+        labels = {}
+        for label in @data.labels
+            labels[label.id] = label
+        labels
+
+    # Return the labels with the specified ids
+    extractLabelsWithIds: (ids) ->
         labels = []
         for label in @data.labels
             if label.id in ids
@@ -61,7 +69,7 @@ class Extractor
         for list in @data.lists
             isOpen = list.id in @meta.openStateLists
             isInProgress = list.id in @meta.inProgressStateLists
-            isCompleted = list.id in @meta.completedStateLists 
+            isCompleted = list.id in @meta.completedStateLists
 
             if (states.open and isOpen) or (states.inProgress and isInProgress) or (states.completed and isCompleted)
                 listsById[list.id] = list
@@ -70,7 +78,7 @@ class Extractor
 
     extractCards: (filter = {
             cardIds: false
-            labelIds: false 
+            labelIds: false
             onlyAfterDate: false
             onlyBeforeDate: false
             includeClosedCards: false
@@ -103,7 +111,7 @@ class Extractor
                 if filter.onlyBeforeDate is false or moment(card.firstActionOnBoard).isBefore filter.onlyBeforeDate
 
                     # Filter closed cards
-                    if filter.includeClosedCards is true or card.closed is false 
+                    if filter.includeClosedCards is true or card.closed is false
 
                         # Filter cards with the specified id
                         if filter.cardIds is false or card.id in filter.cardIds
@@ -115,7 +123,7 @@ class Extractor
                             else if filter.labelIds and filter.labelIds.length is 0
                                 if card.idLabels.length is 0
                                     cardsById[card.id] = card
-                                else 
+                                else
                                     continue
                             # If filtering by label is checked, test if the card contains all specified labels
                             else if (filter.labelIds.every (element) -> element in card.idLabels)

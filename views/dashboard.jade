@@ -16,21 +16,33 @@ mixin histogram(id, title, data)
         };
         Plotly.newPlot('histogram-#{id}', data, layout);
 
-mixin card-flow-table(cards)
-    table.table.table-striped.table-condensed
-        thead
-            tr
-                th Name
-                th Reaction
-                th Lead
-                th Cycle
-        tbody
-            each card in cards
-                tr
-                    td!=card.name
-                    td!=card.flow.reaction
-                    td!=card.flow.lead
-                    td!=card.flow.cycle
+mixin card-table(cards, lists, labels)
+    div.row
+        div.col-md-12
+            h3 Flow Items
+            table.table.table-striped.table-condensed
+                thead
+                    tr
+                        th Name
+                        th Labels
+                        th Reaction
+                        th Lead
+                        th Cycle
+                        each list in lists
+                            th!=list.name
+                tbody
+                    each card in cards
+                        tr
+                            td!=card.name
+                            td
+                                each idLabel in card.idLabels
+                                    span.label(class=labels[idLabel].color)!=labels[idLabel].name
+                                    &nbsp;
+                            td!=(card.flow.reaction || 0).toFixed(2) + ' hours'
+                            td!=(card.flow.lead || 0).toFixed(2) + ' hours'
+                            td!=(card.flow.cycle || 0).toFixed(2) + ' hours'
+                            each list, id in lists
+                                td!=(card.times[id] || 0).toFixed(2) + ' hours'
 
 mixin list-time-table(times)
     table.table.table-striped
@@ -53,16 +65,17 @@ mixin list-time-table(times)
                 if times.max != undefined
                     td!=(times.max || 0).toFixed(2) + ' hours'
 
-mixin metrics(id, title, data)
+mixin metrics(id, title, data, labels)
     div.row
         div.col-md-12
-            //if labels
-            //    br
-            //    each label, index in labels
-            //        span.label(style="font-size: 15px; background-color: " + label.color)!=label.name
-            //        &nbsp;
-            //else
-            h2!=title
+            if labels
+                br
+                h2
+                    each label, index in labels
+                        span.label(class=label.color)!=label.name
+                        &nbsp;
+            else
+                h2!=title
     if data.flow
         div.row
             div.col-md-12
@@ -87,10 +100,6 @@ mixin metrics(id, title, data)
                 div.col-md-4
                     +histogram(id + '-' + listId, list.name, list.times.values)
                     +list-time-table(list.times)
-    div.row
-        div.col-md-12
-            +card-flow-table(data.cards)
-
 doctype html
 html(lang="en")
     head
@@ -110,6 +119,17 @@ html(lang="en")
 
         link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous")
         link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous")
+        style(type="text/css").
+            .green { background-color: #519839; color: white; }
+            .yellow { background-color: #f2d600; color: white; }
+            .orange { background-color: #ffab4a; color: white; }
+            .red { background-color: #eb5a46; color: white; }
+            .purple { background-color: #89609e; color: white; }
+            .blue { background-color: #0079bf; color: white; }
+            .sky { background-color: #00c2e0; color: white; }
+            .pink { background-color: #cd5a91; color: white; }
+            .lime { background-color: #51e898; color: white; }
+            .black { background-color: ##4d4d4d; color: white; }
 
         title!=title
 
@@ -121,15 +141,17 @@ html(lang="en")
                 div.main.col-md-12
                     h1 Trello Analytics
                     ul.nav.nav-tabs(role="tablist")
-                        li(role="presentation" class="active"): a(href="#global" aria-controls="global" role="tab" data-toggle="tab") Globals
+                        li(role="presentation" class="active"): a(href="#global" aria-controls="global" role="tab" data-toggle="tab") Global
                         each element, index in data.labelFiltered
                             li(role="presentation" class="active")
                                 a(href="#filtered-"+index.replace(',', '-') aria-controls="filtered-#{index.replace(',', '-')}" role="tab" data-toggle="tab")!=element.name
                     div.tab-content
                         div#global.tab-pane.active(role="tabpanel")
                             +metrics('global', 'Global', data.global)
+                            +card-table(data.global.cards, data.global.lists, data.labels)
 
                         each element, index in data.labelFiltered
                             div.tab-pane(id="filtered-"+index.replace(',', '-') role="tabpanel")
-                                +metrics(index, element.name, data.labelFiltered[index])
+                                +metrics(index, element.name, data.labelFiltered[index], data.labelFiltered[index].labels)
+                                +card-table(data.labelFiltered[index].cards, data.labelFiltered[index].lists, data.labels)
 

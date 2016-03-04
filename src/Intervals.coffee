@@ -23,7 +23,14 @@ class Intervals
         }
 
     calculateCardFlow: (lists, card) ->
-        return reaction: 0, lead: 0, cycle: 0
+        reaction = lead = 0
+        for listId, time of card.times
+            isOpen = listId in @meta.openStateLists
+            isInProgress = listId in @meta.inProgressStateLists
+            reaction += time if isOpen
+            lead += time if isInProgress
+
+        return reaction: reaction, lead: lead, cycle: reaction + lead
 
     # Takes all actions from a specific card to count the time a card remained on each list
     # Return an object containing all lists with the time spent on each

@@ -35,6 +35,7 @@ class Analytics
         filter.labelIds = false
         cards = extractor.extractCards filter
         output.global = intervals.calculate lists, cards
+        output.labels = extractor.extractLabelsById()
 
         for combination in labelCombinations
             filter.labelIds = combination
@@ -46,7 +47,7 @@ class Analytics
                 combinationStr = 'no-labels'
                 name = 'No Labels'
             else
-                labels = extractor.extractLabelsByIds combination
+                labels = extractor.extractLabelsWithIds combination
                 for label in labels
                     if name isnt ''
                         name += ' | ' + label.name
