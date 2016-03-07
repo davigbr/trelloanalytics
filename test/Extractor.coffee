@@ -6,17 +6,17 @@ describe 'Extractor', ->
 
         it 'should return only the actions that belong to the specified card', ->
             cardId = '123dd198d890'
-            data = 
+            data =
                 actions: [{
                     type: 'updateCard',
                     data:
-                        card: 
+                        card:
                             id: 'fdf98dfdj98'
                 },{
                     type: 'createCard',
                     data:
                         card:
-                            id: cardId    
+                            id: cardId
                 }]
             extractor = new Extractor data
             actions = extractor.findCardActions cardId
@@ -30,7 +30,7 @@ describe 'Extractor', ->
                 inProgressStateLists: ['3']
                 completedStateLists: ['4']
             }
-            data = 
+            data =
                 lists: [
                     { id: '1', name: 'None', closed: false }
                     { id: '2', name: 'To Do', closed: false }
@@ -50,7 +50,7 @@ describe 'Extractor', ->
                 inProgressStateLists: ['3']
                 completedStateLists: ['4']
             }
-            data = 
+            data =
                 lists: [
                     { id: '1', name: 'None', closed: false }
                     { id: '2', name: 'To Do', closed: false }
@@ -58,7 +58,7 @@ describe 'Extractor', ->
                     { id: '4', name: 'Done', closed: false }
                 ]
             extractor = new Extractor data, meta
-            states = 
+            states =
                 open: false
                 inProgress: true
                 completed: false
@@ -69,7 +69,7 @@ describe 'Extractor', ->
     describe 'extractLabelCombinations()', ->
 
         it 'should return all combinations of labels present in the passed cards', ->
-            data = 
+            data =
                 actions: []
                 cards: [
                     { id: '1', idLabels: [], name: 'A Story', closed: false }
@@ -93,7 +93,7 @@ describe 'Extractor', ->
         meta = completedStateLists: ['3']
 
         it 'should return only the cards that reached the completed states', ->
-            data = 
+            data =
                 actions: []
                 cards: [
                     { id: '1', name: 'A Story', closed: false, idList: '1' },
@@ -105,7 +105,7 @@ describe 'Extractor', ->
             expect(cards['2'].name).to.be 'Another Story'
 
         it 'should return all cards by id if no filtering is specified', ->
-            data = 
+            data =
                 actions: []
                 cards: [
                     { id: '1', name: 'A Story', closed: false, idList: '3' },
@@ -118,7 +118,7 @@ describe 'Extractor', ->
             expect(cards['2'].name).to.be 'Another Story'
 
         it 'should return only the cards with the specified ids if card ids are passed as filter', ->
-            data = 
+            data =
                 actions: []
                 cards: [
                     { id: '1', name: 'A Story', closed: false, idList: '3' }
@@ -133,10 +133,10 @@ describe 'Extractor', ->
             expect(cards['3'].name).to.be 'Sad Story'
 
         it 'should return only the cards containing all specified labels if label ids are passed as filter', ->
-            data = 
+            data =
                 actions: []
                 cards: [
-                    { id: '1', idLabels: [], name: 'A Story', closed: false, idList: '3' }
+                    { id: '1', idLabels: ['1'], name: 'A Story', closed: false, idList: '3' }
                     { id: '2', idLabels: ['1', '2'], name: 'Another Story', closed: false, idList: '3' }
                     { id: '3', idLabels: ['3'], name: 'Sad Story', closed: false, idList: '3' }
                     { id: '4', idLabels: ['2'], name: 'Happy Story', closed: false, idList: '3' }
@@ -146,8 +146,22 @@ describe 'Extractor', ->
             expect(Object.keys(cards).length).to.be 1
             expect(cards['2'].name).to.be 'Another Story'
 
+        it 'should return only the cards containing exactly the same labels as passed', ->
+            data =
+                actions: []
+                cards: [
+                    { id: '1', idLabels: ['1'], name: 'A Story', closed: false, idList: '3' }
+                    { id: '2', idLabels: ['1', '2'], name: 'Another Story', closed: false, idList: '3' }
+                    { id: '3', idLabels: ['3'], name: 'Sad Story', closed: false, idList: '3' }
+                    { id: '4', idLabels: ['2'], name: 'Happy Story', closed: false, idList: '3' }
+                ]
+            extractor = new Extractor data, meta, meta
+            cards = extractor.extractCards(labelIds: ['1'])
+            expect(Object.keys(cards).length).to.be 1
+            expect(cards['1'].name).to.be 'A Story'
+
         it 'should return only the cards without labels if labelIds filter is passed as an empty array', ->
-            data = 
+            data =
                 actions: []
                 cards: [
                     { id: '1', idLabels: [], name: 'A Story', closed: false, idList: '3' }
@@ -161,7 +175,7 @@ describe 'Extractor', ->
             expect(cards['1'].name).to.be 'A Story'
 
         it 'should not return closed cards by default', ->
-            data = 
+            data =
                 actions: []
                 cards: [
                     { id: '1', idLabels: [], name: 'A Story', closed: false, idList: '3' }
@@ -176,7 +190,7 @@ describe 'Extractor', ->
             expect(cards['4'].name).to.be 'Happy Story'
 
         it 'should include closed cards if true is passed to the filter', ->
-            data = 
+            data =
                 actions: []
                 cards: [
                     { id: '1', idLabels: [], name: 'A Story', closed: false, idList: '3' }
@@ -191,9 +205,9 @@ describe 'Extractor', ->
             expect(cards['2'].name).to.be 'Another Story'
             expect(cards['3'].name).to.be 'Sad Story'
             expect(cards['4'].name).to.be 'Happy Story'
-        
+
         it 'should include closed cards if true is passed to the filter', ->
-            data = 
+            data =
                 actions: []
                 cards: [
                     { id: '1', idLabels: [], name: 'A Story', closed: false, idList: '3' }
@@ -210,12 +224,12 @@ describe 'Extractor', ->
             expect(cards['4'].name).to.be 'Happy Story'
 
         it 'should include only cards with the first action after the specified date', ->
-            data = 
+            data =
                 actions: [
                     { id: '1', type: 'createCard', date: '2001-01-01T00:00:00.000Z', data: card: id: '1' }
                     { id: '2', type: 'createCard', date: '2002-01-01T00:00:00.000Z', data: card: id: '2' }
                     { id: '3', type: 'createCard', date: '2003-01-01T00:00:00.000Z', data: card: id: '3' }
-                    { id: '4', type: 'createCard', date: '2004-01-01T00:00:00.000Z', data: card: id: '4' }               
+                    { id: '4', type: 'createCard', date: '2004-01-01T00:00:00.000Z', data: card: id: '4' }
                 ]
                 cards: [
                     { id: '1', idLabels: [], name: 'A Story', closed: false, idList: '3' }
@@ -231,7 +245,7 @@ describe 'Extractor', ->
             expect(cards['4'].name).to.be 'Happy Story'
 
         it 'should include only cards with the first action before the specified date', ->
-            data = 
+            data =
                 actions: [
                     { id: '1', type: 'createCard', date: '2001-01-01T00:00:00.000Z', data: card: id: '1' }
                     { id: '2', type: 'createCard', date: '2002-01-01T00:00:00.000Z', data: card: id: '2' }

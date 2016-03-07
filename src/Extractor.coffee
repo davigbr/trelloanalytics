@@ -91,6 +91,9 @@ class Extractor
         filter.onlyAfterDate = false unless filter.onlyAfterDate instanceof Date
         filter.onlyBeforeDate = false unless filter.onlyBeforeDate instanceof Date
 
+        arrayEqual = (a, b) ->
+            a.length is b.length and a.every (elem, i) -> elem is b[i]
+
         for card in @data.cards
 
             # Ignore cards that are not in the completed state lists specified in the meta object
@@ -125,8 +128,9 @@ class Extractor
                                     cardsById[card.id] = card
                                 else
                                     continue
+
                             # If filtering by label is checked, test if the card contains all specified labels
-                            else if (filter.labelIds.every (element) -> element in card.idLabels)
+                            else if arrayEqual filter.labelIds, card.idLabels
                                 cardsById[card.id] = card
         cardsById
 
