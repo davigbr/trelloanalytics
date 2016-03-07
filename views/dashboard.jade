@@ -25,11 +25,11 @@ mixin card-table(cards, lists, labels)
                     tr
                         th Name
                         th Labels
-                        th Reaction
-                        th Lead
-                        th Cycle
+                        th Reaction (h)
+                        th Lead (h)
+                        th Cycle (h)
                         each list in lists
-                            th!=list.name
+                            th!=list.name + ' (h)'
                 tbody
                     each card in cards
                         tr
@@ -38,11 +38,11 @@ mixin card-table(cards, lists, labels)
                                 each idLabel in card.idLabels
                                     span.label(class=labels[idLabel].color)!=labels[idLabel].name
                                     &nbsp;
-                            td!=(card.flow.reaction || 0).toFixed(2) + ' hours'
-                            td!=(card.flow.lead || 0).toFixed(2) + ' hours'
-                            td!=(card.flow.cycle || 0).toFixed(2) + ' hours'
+                            td!=(card.flow.reaction || 0).toFixed(2)
+                            td!=(card.flow.lead || 0).toFixed(2)
+                            td!=(card.flow.cycle || 0).toFixed(2)
                             each list, id in lists
-                                td!=(card.times[id] || 0).toFixed(2) + ' hours'
+                                td!=(card.times[id] || 0).toFixed(2)
 
 mixin list-time-table(times)
     table.table.table-striped

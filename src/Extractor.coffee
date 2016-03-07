@@ -77,6 +77,7 @@ class Extractor
         listsById
 
     extractCards: (filter = {
+            listId: false
             cardIds: false
             labelIds: false
             onlyAfterDate: false
@@ -85,6 +86,7 @@ class Extractor
         }) ->
         cardsById = {}
 
+        filter.listId = false unless typeof filter.listId is 'string'
         filter.labelIds = false if not Array.isArray filter.labelIds
         filter.cardIds = false if not Array.isArray filter.cardIds
         filter.includeClosedCards = false unless typeof filter.includeClosedCards is 'boolean'
@@ -100,38 +102,41 @@ class Extractor
             unless card.idList in @meta.completedStateLists
                 continue
 
-            card.actions = @findCardActions card.id
+            # Filter by list id
+            if filter.listId is false or filter.listId is card.idList
 
-            if card.actions.length is 0
-                card.firstActionOnBoard = new Date 0 # Unix Epoch
-            else
-                card.firstActionOnBoard = new Date card.actions[0].date
+                card.actions = @findCardActions card.id
 
-            # Filter cards after date
-            if filter.onlyAfterDate is false or moment(card.firstActionOnBoard).isAfter filter.onlyAfterDate
+                if card.actions.length is 0
+                    card.firstActionOnBoard = new Date 0 # Unix Epoch
+                else
+                    card.firstActionOnBoard = new Date card.actions[0].date
 
-                # Filte rcards before date
-                if filter.onlyBeforeDate is false or moment(card.firstActionOnBoard).isBefore filter.onlyBeforeDate
+                # Filter cards after date
+                if filter.onlyAfterDate is false or moment(card.firstActionOnBoard).isAfter filter.onlyAfterDate
 
-                    # Filter closed cards
-                    if filter.includeClosedCards is true or card.closed is false
+                    # Filte rcards before date
+                    if filter.onlyBeforeDate is false or moment(card.firstActionOnBoard).isBefore filter.onlyBeforeDate
 
-                        # Filter cards with the specified id
-                        if filter.cardIds is false or card.id in filter.cardIds
+                        # Filter closed cards
+                        if filter.includeClosedCards is true or card.closed is false
 
-                            if filter.labelIds is false
-                                cardsById[card.id] = card
+                            # Filter cards with the specified id
+                            if filter.cardIds is false or card.id in filter.cardIds
 
-                            # If filtering by label is checked, test if labelIds is an empty array and the card has no labels
-                            else if filter.labelIds and filter.labelIds.length is 0
-                                if card.idLabels.length is 0
+                                if filter.labelIds is false
                                     cardsById[card.id] = card
-                                else
-                                    continue
 
-                            # If filtering by label is checked, test if the card contains all specified labels
-                            else if arrayEqual filter.labelIds, card.idLabels
-                                cardsById[card.id] = card
+                                # If filtering by label is checked, test if labelIds is an empty array and the card has no labels
+                                else if filter.labelIds and filter.labelIds.length is 0
+                                    if card.idLabels.length is 0
+                                        cardsById[card.id] = card
+                                    else
+                                        continue
+
+                                # If filtering by label is checked, test if the card contains all specified labels
+                                else if arrayEqual filter.labelIds, card.idLabels
+                                    cardsById[card.id] = card
         cardsById
 
 module.exports = Extractor

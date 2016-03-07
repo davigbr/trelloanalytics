@@ -30,10 +30,11 @@ app.get '/authorized/board/:token/', (req, res) ->
     boardId = req.query['id']
     beforeDate = req.query['beforeDate']
     afterDate = req.query['afterDate']
+    listId = req.query['listId']
 
     # Board already selected
     if boardId
-        res.redirect "/authorized/board/#{token}/#{boardId}?beforeDate=#{beforeDate}&afterDate={#{afterDate}"
+        res.redirect "/authorized/board/#{token}/#{boardId}?beforeDate=#{beforeDate}&afterDate=#{afterDate}&listId=#{listId}"
 
     # Board not selected yet
     else
@@ -52,6 +53,7 @@ app.get '/authorized/board/:token/:boardId', (req, res) ->
     token = req.params.token
     boardId = req.params.boardId
 
+    listId = req.query['listId']
     onlyAfterDate = moment(req.query['afterDate'], 'YYYY-MM-DD')
     onlyBeforeDate = moment(req.query['beforeDate'], 'YYYY-MM-DD')
 
@@ -71,6 +73,7 @@ app.get '/authorized/board/:token/:boardId', (req, res) ->
             includeClosedCards: false
             onlyAfterDate: onlyAfterDate
             onlyBeforeDate: onlyBeforeDate
+            listId: listId
         analytics = new Analytics()
         processedData = analytics.process data, filter
         res.render 'dashboard',
