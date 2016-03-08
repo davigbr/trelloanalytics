@@ -86,7 +86,7 @@ class Extractor
         }) ->
         cardsById = {}
 
-        filter.listId = false unless typeof filter.listId is 'string'
+        filter.listId = false unless typeof filter.listId is 'string' and filter.listId isnt ''
         filter.labelIds = false if not Array.isArray filter.labelIds
         filter.cardIds = false if not Array.isArray filter.cardIds
         filter.includeClosedCards = false unless typeof filter.includeClosedCards is 'boolean'

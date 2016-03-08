@@ -47,8 +47,8 @@ describe 'Intervals', ->
             extractor = new Extractor readDataFile('few-actions'), meta
             output = intervals.calculate extractor.extractLists(), extractor.extractCards()
 
-            expect(output.flow.cycle.median).to.be 0.004443333333333333
-            expect(output.flow.lead.median).to.be 0.0026748611111111114
+            expect(output.flow.lead.median).to.be 0.004443333333333333
+            expect(output.flow.cycle.median).to.be 0.0026748611111111114
             expect(output.flow.reaction.median).to.be 0.0017684722222222223
 
         it 'should calculate the list times correctly', ->
