@@ -1,3 +1,5 @@
+Promise = require 'promise'
+
 Trello = require 'node-trello'
 
 class TrelloFetcher
@@ -75,32 +77,63 @@ class TrelloFetcher
 
     # Fetch a trello board with some related information, like cards, actions and lists
     loadBoard: (boardId, callback) ->
-        @trello.get "/1/board/#{boardId}", (err, board) =>
-            return callback(err) if err
 
-            @trello.get "/1/board/#{boardId}/labels", (err, labels) =>
-                return callback(err) if err
+        fetchBoard = (output) =>
+            new Promise (fulfill, reject) =>
+                @trello.get "/1/board/#{boardId}", (err, board) =>
+                    return reject(err) if err
+                    output.board = board
+                    fulfill output
 
+        fetchLabels = (output) =>
+            new Promise (fulfill, reject) =>
+                @trello.get "/1/board/#{boardId}/labels", (err, labels) =>
+                    return reject(err) if err
+                    output.labels = labels
+                    fulfill output
+
+        fetchActions = (output) =>
+            new Promise (fulfill, reject) =>
                 @trello.get "/1/board/#{boardId}/actions?limit=1000", (err, actions) =>
-                    return callback(err) if err
+                    return reject(err) if err
+                    output.actions = actions
+                    fulfill output
 
-                    @trello.get "/1/board/#{boardId}/lists", (err, lists) =>
-                        return callback(err) if err
+        fetchOpenLists = (output) =>
+            new Promise (fulfill, reject) =>
+                @trello.get "/1/board/#{boardId}/lists", (err, openLists) =>
+                    return reject(err) if err
+                    output.openLists = openLists
+                    fulfill output
 
-                        @trello.get "/1/board/#{boardId}/lists/closed", (err, closedLists) =>
-                            return callback(err) if err
+        fetchClosedLists = (output) =>
+            new Promise (fulfill, reject) =>
+                @trello.get "/1/board/#{boardId}/lists/closed", (err, closedLists) =>
+                    return reject(err) if err
+                    output.closedLists = closedLists
+                    fulfill output
 
-                            @trello.get "/1/board/#{boardId}/cards/all", (err, cards) =>
-                                return callback(err) if err
+        fetchCards = (output) =>
+            new Promise (fulfill, reject) =>
+                @trello.get "/1/board/#{boardId}/cards/all", (err, cards) =>
+                    return reject(err) if err
+                    output.cards = cards
+                    fulfill output
 
-                                allLists = lists.concat closedLists
-                                output =
-                                    board: @cleanBoard board
-                                    labels: @cleanLabels labels
-                                    actions: @cleanActions actions
-                                    lists: @cleanLists allLists
-                                    cards: @cleanCards cards
+        onReject = (err) ->
+            callback err
 
-                                callback null, output
+        done = (output) ->
+            output.lists = output.openLists.concat output.closedLists
+            delete output['closedLists']
+            callback null, output
+
+        promise = fetchBoard({})
+        promise = promise.then fetchLabels, onReject
+        promise = promise.then fetchActions, onReject
+        promise = promise.then fetchOpenLists, onReject
+        promise = promise.then fetchClosedLists, onReject
+        promise = promise.then fetchCards, onReject
+        promise = promise.done done, onReject
 
 module.exports = TrelloFetcher

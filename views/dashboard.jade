@@ -46,7 +46,7 @@ mixin card-table(cards, lists, labels)
                                 td(title=list.name)!=(card.times[id] || 0).toFixed(2)
 
 mixin list-time-table(times)
-    table.table.table-striped
+    table.table.table-striped(style="width: 100%")
         thead
             tr
                 th Count
