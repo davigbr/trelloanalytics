@@ -94,10 +94,18 @@ class TrelloFetcher
 
         fetchActions = (output) =>
             new Promise (fulfill, reject) =>
-                @trello.get "/1/board/#{boardId}/actions?limit=1000", (err, actions) =>
-                    return reject(err) if err
-                    output.actions = actions
-                    fulfill output
+                output.actions = []
+                before = null
+                fetchNextActions = =>
+                    @trello.get "/1/board/#{boardId}/actions?limit=1000&before=#{before}", (err, actions) =>
+                        return reject(err) if err
+                        output.actions = output.actions.concat actions
+                        if actions.length < 1000
+                            fulfill output
+                        else
+                            before = actions[actions.length - 1].date
+                            fetchNextActions()
+                fetchNextActions()
 
         fetchOpenLists = (output) =>
             new Promise (fulfill, reject) =>
