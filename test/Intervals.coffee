@@ -41,15 +41,15 @@ describe 'Intervals', ->
                 expect(list.times.max).to.be null
                 expect(list.times.min).to.be null
 
-        msInAnHr = 60 * 60 * 1000
+        msInADay = 60 * 60 * 1000 * 24
 
         it 'should calculate the flow times correctly', ->
             extractor = new Extractor readDataFile('few-actions'), meta
             output = intervals.calculate extractor.extractLists(), extractor.extractCards()
 
-            expect(output.flow.lead.median).to.be 0.004443333333333333
-            expect(output.flow.cycle.median).to.be 0.0026748611111111114
-            expect(output.flow.reaction.median).to.be 0.0017684722222222223
+            expect(output.flow.lead.median).to.be 0.00018513888888888887
+            expect(output.flow.cycle.median).to.be 0.00011145254629629629
+            expect(output.flow.reaction.median).to.be 0.00007368634259259259
 
         it 'should calculate the list times correctly', ->
             extractor = new Extractor readDataFile('few-actions'), meta
@@ -57,21 +57,21 @@ describe 'Intervals', ->
             todo = output.lists[todoId]
             doing = output.lists[doingId]
 
-            expect(todo.times.sum).to.be 12733 / msInAnHr
+            expect(todo.times.sum).to.be 12733 / msInADay
             expect(todo.times.count).to.be 2
-            expect(todo.times.mean).to.be 6366.5 / msInAnHr
-            expect(todo.times.median).to.be 6366.5 / msInAnHr
-            expect(todo.times.max).to.be 6981 / msInAnHr
-            expect(todo.times.min).to.be 5752 / msInAnHr
-            expect(todo.times.values).to.eql [6981 / msInAnHr, 5752 / msInAnHr]
+            expect(todo.times.mean).to.be 6366.5 / msInADay
+            expect(todo.times.median).to.be 6366.5 / msInADay
+            expect(todo.times.max).to.be 6981 / msInADay
+            expect(todo.times.min).to.be 5752 / msInADay
+            expect(todo.times.values).to.eql [6981 / msInADay, 5752 / msInADay]
 
-            expect(doing.times.sum).to.be 0.005349722222222223
+            expect(doing.times.sum).to.be 0.00022290509259259258
             expect(doing.times.count).to.be 2
-            expect(doing.times.mean).to.be 0.0026748611111111114
-            expect(doing.times.median).to.be 0.0026748611111111114
-            expect(doing.times.max).to.be 10514 / msInAnHr
-            expect(doing.times.min).to.be 8745 / msInAnHr
-            expect(doing.times.values).to.eql [10514 / msInAnHr, 8745 / msInAnHr]
+            expect(doing.times.mean).to.be 0.00011145254629629629
+            expect(doing.times.median).to.be 0.00011145254629629629
+            expect(doing.times.max).to.be 10514 / msInADay
+            expect(doing.times.min).to.be 8745 / msInADay
+            expect(doing.times.values).to.eql [10514 / msInADay, 8745 / msInADay]
 
         it 'should calculate the card times correctly', ->
             extractor = new Extractor readDataFile('few-actions'), meta
@@ -79,9 +79,9 @@ describe 'Intervals', ->
             aStoryCard = output.cards[aStoryCardId]
             anotherStoryCard = output.cards[anotherStoryCardId]
 
-            expect(aStoryCard.times[todoId]).to.be 6981 / msInAnHr
-            expect(aStoryCard.times[doingId]).to.be 10514 / msInAnHr
-            expect(anotherStoryCard.times[todoId]).to.be 5752 / msInAnHr
-            expect(anotherStoryCard.times[doingId]).to.be 8745 / msInAnHr
+            expect(aStoryCard.times[todoId]).to.be 6981 / msInADay
+            expect(aStoryCard.times[doingId]).to.be 10514 / msInADay
+            expect(anotherStoryCard.times[todoId]).to.be 5752 / msInADay
+            expect(anotherStoryCard.times[doingId]).to.be 8745 / msInADay
 
 
