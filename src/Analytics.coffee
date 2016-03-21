@@ -26,7 +26,7 @@ class Analytics
             inProgress: true
             completed: false
 
-        lists = extractor.extractLists(states)
+        lists = extractor.extractLists states
 
         output =
             data: {}
@@ -61,6 +61,10 @@ class Analytics
                 cards: listsAndCards.cards
                 flow: listsAndCards.flow
 
+        filter.labelIds = false
+        filter.state = 'in-progress'
+        inProgressCards = extractor.extractCards filter
+        output.inProgress = intervals.calculate lists, inProgressCards
         return output
 
 module.exports = Analytics

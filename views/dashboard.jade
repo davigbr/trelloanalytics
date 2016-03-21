@@ -8,7 +8,7 @@ mixin histogram(id, title, data)
         }];
         var layout = {
             title: '#{title}',
-            xaxis: { title: 'Hours' },
+            xaxis: { title: 'Days' },
             yaxis: { title: 'Number of Items' },
             barmode: 'overlay',
             bargap: 0.05,
@@ -19,18 +19,17 @@ mixin histogram(id, title, data)
 mixin card-table(cards, lists, labels)
     div.row
         div.col-md-12
-            h3 Flow Items
             table.table.table-striped.table-condensed.card-table
                 thead
                     tr
                         th Name
                         th Labels
-                        th Reaction (h)
-                        th Cycle (h)
-                        th Lead (h)
+                        th Reaction
+                        th Cycle
+                        th Lead
                         each list in lists
-                            th(title=list.name + ' (h)')
-                                span.ellipsis!=list.name + ' (h)'
+                            th(title=list.name)
+                                span.ellipsis!=list.name
                 tbody
                     each card in cards
                         tr
@@ -39,11 +38,11 @@ mixin card-table(cards, lists, labels)
                                 each idLabel in card.idLabels
                                     span.label(class=labels[idLabel].color)!=labels[idLabel].name
                                     &nbsp;
-                            td(title="Reaction Time (h)")!=(card.flow.reaction || 0).toFixed(2)
-                            td(title="Cycle Time (h)")!=(card.flow.cycle || 0).toFixed(2)
-                            td(title="Lead Time (h)")!=(card.flow.lead || 0).toFixed(2)
+                            td(title="Reaction Time")!=(card.flow.reaction || 0).toFixed(2) + ' days'
+                            td(title="Cycle Time")!=(card.flow.cycle || 0).toFixed(2) + ' days'
+                            td(title="Lead Time")!=(card.flow.lead || 0).toFixed(2) + ' days'
                             each list, id in lists
-                                td(title=list.name)!=(card.times[id] || 0).toFixed(2)
+                                td(title=list.name)!=(card.times[id] || 0).toFixed(2) + ' days'
 
 mixin list-time-table(times)
     table.table.table-striped(style="width: 100%")
@@ -59,12 +58,12 @@ mixin list-time-table(times)
         tbody
             tr
                 td!=(times.count || 0).toFixed(0) + ' items'
-                td!=(times.mean || 0).toFixed(2) + ' hours'
-                td!=(times.median || 0).toFixed(2) + ' hours'
+                td!=(times.mean || 0).toFixed(2) + ' days'
+                td!=(times.median || 0).toFixed(2) + ' days'
                 if times.min != undefined
-                    td!=(times.min || 0).toFixed(2) + ' hours'
+                    td!=(times.min || 0).toFixed(2) + ' days'
                 if times.max != undefined
-                    td!=(times.max || 0).toFixed(2) + ' hours'
+                    td!=(times.max || 0).toFixed(2) + ' days'
 
 mixin metrics(id, title, data, labels)
     div.row
@@ -159,10 +158,15 @@ html(lang="en")
                     div.tab-content
                         div#global.tab-pane.active(role="tabpanel")
                             +metrics('global', 'Global', data.global)
+                            h3 Flow Items
                             +card-table(data.global.cards, data.global.lists, data.labels)
 
                         each element, index in data.labelFiltered
                             div.tab-pane(id="filtered-"+index.replace(',', '-') role="tabpanel")
                                 +metrics(index, element.name, data.labelFiltered[index], data.labelFiltered[index].labels)
+                                h3 Flow Items
                                 +card-table(data.labelFiltered[index].cards, data.labelFiltered[index].lists, data.labels)
-
+            div.row
+                div.main.col-md-12
+                    h2 In Progress Items
+                    +card-table(data.inProgress.cards, data.inProgress.lists, data.labels)

@@ -3,7 +3,7 @@ math = require 'mathjs'
 class Intervals
     constructor: (@now, @meta) ->
 
-    # Takes  card nad lists data and returns and
+    # Takes card and lists data and returns an
     # object containing lists and cards with processed times
     calculate: (lists, cards) ->
         # Makes a copy of the passed objects
@@ -51,7 +51,7 @@ class Intervals
                 nextAction = null
                 nextActionDate = @now
 
-            timestampDifference = (nextActionDate.getTime() - currentActionDate.getTime()) / (60*60*1000)
+            timestampDifference = (nextActionDate.getTime() - currentActionDate.getTime()) / (60*60*1000*24)
 
             if currentAction.type in ['updateCard', 'createCard']
                 currentList = null

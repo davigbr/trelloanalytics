@@ -83,6 +83,7 @@ class Extractor
             onlyAfterDate: false
             onlyBeforeDate: false
             includeClosedCards: false
+            state: 'completed'
         }) ->
         cardsById = {}
 
@@ -92,14 +93,17 @@ class Extractor
         filter.includeClosedCards = false unless typeof filter.includeClosedCards is 'boolean'
         filter.onlyAfterDate = false unless filter.onlyAfterDate instanceof Date
         filter.onlyBeforeDate = false unless filter.onlyBeforeDate instanceof Date
+        filter.state = 'completed' unless typeof filter.state is 'string'
 
         arrayEqual = (a, b) ->
             a.length is b.length and a.every (elem, i) -> elem is b[i]
 
         for card in @data.cards
 
-            # Ignore cards that are not in the completed state lists specified in the meta object
-            unless card.idList in @meta.completedStateLists
+            # Check the state filter param
+            if filter.state is 'completed' and card.idList not in @meta.completedStateLists
+                continue
+            else if filter.state is 'in-progress' and card.idList not in @meta.inProgressStateLists
                 continue
 
             # Filter by list id
