@@ -38,11 +38,11 @@ mixin card-table(cards, lists, labels)
                                 each idLabel in card.idLabels
                                     span.label(class=labels[idLabel].color)!=labels[idLabel].name
                                     &nbsp;
-                            td(title="Reaction Time")!=(card.flow.reaction || 0).toFixed(2) + ' days'
-                            td(title="Cycle Time")!=(card.flow.cycle || 0).toFixed(2) + ' days'
-                            td(title="Lead Time")!=(card.flow.lead || 0).toFixed(2) + ' days'
+                            td.days-cell(title="Reaction Time")!=(card.flow.reaction || 0).toFixed(2)
+                            td.days-cell(title="Cycle Time")!=(card.flow.cycle || 0).toFixed(2)
+                            td.days-cell(title="Lead Time")!=(card.flow.lead || 0).toFixed(2)
                             each list, id in lists
-                                td(title=list.name)!=(card.times[id] || 0).toFixed(2) + ' days'
+                                td.days-cell(title=list.name)!=(card.times[id] || 0).toFixed(2)
 
 mixin list-time-table(times)
     table.table.table-striped(style="width: 100%")
@@ -57,13 +57,13 @@ mixin list-time-table(times)
                     th Max
         tbody
             tr
-                td!=(times.count || 0).toFixed(0) + ' items'
-                td!=(times.mean || 0).toFixed(2) + ' days'
-                td!=(times.median || 0).toFixed(2) + ' days'
+                td.items-cell!=(times.count || 0).toFixed(0)
+                td.days-cell!=(times.mean || 0).toFixed(2)
+                td.days-cell!=(times.median || 0).toFixed(2)
                 if times.min != undefined
-                    td!=(times.min || 0).toFixed(2) + ' days'
+                    td.days-cell!=(times.min || 0).toFixed(2)
                 if times.max != undefined
-                    td!=(times.max || 0).toFixed(2) + ' days'
+                    td.days-cell!=(times.max || 0).toFixed(2)
 
 mixin metrics(id, title, data, labels)
     div.row
@@ -140,6 +140,8 @@ html(lang="en")
                 white-space: nowrap;
                 display: block;
             }
+            .days-cell::after { content: " days" }
+            .items-cell::after { content: " items" }
 
         title!=title
 
