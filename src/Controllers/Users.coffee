@@ -55,7 +55,7 @@ class Users
         # Protects other urls if user is not authenticated
         app.use (req, res, next) ->
             authFreeUrls = ['/', Users.loginUrl, Users.logoutUrl, Users.signupUrl]
-            userAuthenticated = typeof req.session.passport.user is 'number'
+            userAuthenticated = typeof req.session.passport?.user is 'number'
 
             # Sends authenticated var to the view
             res.locals.authenticated = userAuthenticated
