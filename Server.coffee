@@ -34,6 +34,8 @@ class Server
         databaseOptions =
             process.env.JAWSDB_URL or localOptions
 
+        console.log databaseOptions
+
         # Setup connection middleware
         @app.use (req, res, next) ->
             connection = mysql.createConnection databaseOptions
