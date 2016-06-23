@@ -1,0 +1,49 @@
+.green { background-color: #519839; color: white; }
+.yellow { background-color: #f2d600; color: white; }
+.orange { background-color: #ffab4a; color: white; }
+.red { background-color: #eb5a46; color: white; }
+.purple { background-color: #89609e; color: white; }
+.blue { background-color: #0079bf; color: white; }
+.sky { background-color: #00c2e0; color: white; }
+.pink { background-color: #cd5a91; color: white; }
+.lime { background-color: #51e898; color: white; }
+.black { background-color: ##4d4d4d; color: white; }
+.ellipsis {
+    text-overflow: ellipsis;
+    width: 80px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+}
+.days-cell::after { content: " days" }
+.items-cell::after { content: " items" }
+
+body {
+  padding-top: 70px;
+  padding-bottom: 30px;
+}
+
+p {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+p.bg-danger {
+  padding: 15px;
+}
+p.bg-success {
+  padding: 15px;
+}
+
+.theme-dropdown .dropdown-menu {
+  position: static;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.theme-showcase > p > .btn {
+  margin: 5px 0;
+}
+
+.theme-showcase .navbar .container {
+  width: auto;
+}

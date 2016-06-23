@@ -1,0 +1,35 @@
+extends ../Layout/main.jade
+
+block head
+    script(type="text/javascript").
+        $(function(){
+            $('#process').click(function() {
+                $(this).addClass('disabled');
+                $(this).html('Processing...');
+            });
+        });
+
+block content
+    div.row
+        div.col-lg-12
+            form.form-inline(action='/boards/process' method='post')
+                .form-group
+                    label(for='boardId') Please select a board: &nbsp;
+                    select.form-control(id="boardId" name="id")
+                        each board in boards
+                            option(value="#{board.id}")!=board.name
+                    br
+                    br
+                    label(for='afterDate') After Date:&nbsp;
+                    input#afterDate.form-control(name="afterDate" type="date")
+                    br
+                    br
+                    label(for='beforeDate') Before Date:&nbsp;
+                    input#beforeDate.form-control(name="beforeDate" type="date")
+                    br
+                    br
+                    label(for='listId') List Id:&nbsp;
+                    input#listId.form-control(name="listId" type="text")
+                    br
+                    br
+                    button#process.btn.btn-default(type='submit') Process
