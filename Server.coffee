@@ -24,12 +24,15 @@ class Server
           controller.setup @app
 
     loadModels: ->
-        databaseOptions =
+        localOptions =
             host: '127.0.0.1',
             user: 'root',
             password: '',
             port: 3306,
             database: 'trelloanalytics'
+
+        databaseOptions =
+            process.env.JAWSDB_URL or localOptions
 
         # Setup connection middleware
         @app.use (req, res, next) ->
