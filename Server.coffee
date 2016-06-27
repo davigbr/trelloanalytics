@@ -38,8 +38,8 @@ class Server
 
         # Setup connection middleware
         @app.use (req, res, next) ->
-            connection = mysql.createConnection databaseOptions
-            connection.connect (error) ->
+            req.connection = mysql.createConnection databaseOptions
+            req.connection.connect (error) ->
                 if error
                     return res.send "Database error: #{error}"
 
@@ -47,7 +47,7 @@ class Server
                 ['User'].map (modelName) =>
                     modelClass = require "./src/Models/#{modelName}"
                     req.models[modelName] = new modelClass
-                    req.models[modelName].setup connection
+                    req.models[modelName].setup req.connection
                 next()
 
     init: ->
@@ -71,6 +71,11 @@ class Server
 
         @loadModels()
         @loadControllers()
+
+        @app.use (req, res, next) ->
+            if req.connection isnt null
+                req.connection.close()
+            next()
 
         @app.listen @port, @address, =>
             console.log "Server running on port #{@port}!"
