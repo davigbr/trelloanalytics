@@ -38,6 +38,11 @@ class Server
 
         # Setup connection middleware
         @app.use (req, res, next) ->
+            res.on 'finish', ->
+                if req.connection
+                    req.connection.end()
+                    req.connection = null
+
             req.connection = mysql.createConnection databaseOptions
             req.connection.connect (error) ->
                 if error
@@ -71,11 +76,6 @@ class Server
 
         @loadModels()
         @loadControllers()
-
-        @app.use (req, res, next) ->
-            if req.connection isnt null
-                req.connection.close()
-            next()
 
         @app.listen @port, @address, =>
             console.log "Server running on port #{@port}!"
