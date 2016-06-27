@@ -24,15 +24,20 @@ class Server
           controller.setup @app
 
     loadModels: ->
-        localOptions =
+
+        databaseOptions =
             host: '127.0.0.1',
             user: 'root',
             password: '',
             port: 3306,
             database: 'trelloanalytics'
 
-        databaseOptions =
-            process.env.JAWSDB_URL or localOptions
+        if process.env.MYSQL_ADDON_HOST
+            databaseOptions.host = process.env.MYSQL_ADDON_HOST
+            databaseOptions.user = process.env.MYSQL_ADDON_USER
+            databaseOptions.password = process.env.MYSQL_ADDON_PASSWORD
+            databaseOptions.port = process.env.MYSQL_ADDON_PORT
+            databaseOptions.database = process.env.MYSQL_ADDON_DATABASE
 
         console.log databaseOptions
 
